@@ -3,7 +3,8 @@
 
 
 # Notes for development
-
+- suggested IDE is IntelliJ IDEA but feel free to use any IDE you like
+- **Used Java version is 17!!**
 - **Each feature will be done to separate feature branch**
   - for each feature branch there will be a **Merge Request** created to merge it to the master branch
     - before completion, MR will always be marked as **Draft**
