@@ -1,27 +1,55 @@
 package uk.qub.se;
 
+import uk.qub.se.board.Board;
+import uk.qub.se.board.BoardLoader;
+import uk.qub.se.game.Game;
 import uk.qub.se.player.Player;
 import uk.qub.se.player.PlayerLoader;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
+import java.util.Random;
 import java.util.Scanner;
+
 
 public class SaveThePlanetApp {
 
     public static final int MAX_PLAYER_NUM = 4;
     public static final int MIN_PLAYER_NUM = 3;
+    public static final String BOARD_CONFIG_PATH = "board.json";
 
     public static void main(String[] args) {
-        final List<Player> players = loadPlayers();
+        Board board = loadBoard();
 
+        final List<Player> players = loadPlayers();
         if (notEnoughPlayersLoaded(players)) {
             System.out.printf("Minimum number of players required to play the game is %d. " +
                     "Please return once you have enough players.", MIN_PLAYER_NUM);
             System.exit(1);
         }
 
-        for (final Player player : players) {
-            System.out.println("Loaded player: " + player.getName());
+
+        Random random = new Random(5);
+        Game game = new Game(players, board, random);
+        game.startGame();
+    }
+
+    private static Board loadBoard() {
+        final File file = new File(BOARD_CONFIG_PATH);
+
+        final BoardLoader boardLoader = new BoardLoader(file);
+        return loadBoard(boardLoader);
+    }
+
+    private static Board loadBoard(final BoardLoader boardLoader) {
+        try {
+            return boardLoader.loadBoard();
+        } catch (IOException e) {
+            System.out.println("Board loading failed");
+            System.out.println(e.getMessage());
+            System.exit(3);
+            return null;
         }
     }
 
