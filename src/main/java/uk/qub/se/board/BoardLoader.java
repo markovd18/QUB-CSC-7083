@@ -38,6 +38,7 @@ public class BoardLoader {
             if (isEntryFieldArea(entry)) {
                 var field = objectMapper.readValue(objectMapper.writeValueAsString(entry.getValue()), Field.class);
                 field.validate();
+                validateAreas(field.getAreas());
                 fields.add(field);
                 areas.addAll(field.getAreas());
             } else {
@@ -48,6 +49,12 @@ public class BoardLoader {
         }
 
         return new Board(areas, fields);
+    }
+
+    private void validateAreas(final List<? extends Area> areas) {
+        for (final Area area : areas) {
+            area.validate();
+        }
     }
 
     private Area constructArea(ObjectMapper objectMapper, Map.Entry<String, JsonNode> entry) throws JsonProcessingException {
