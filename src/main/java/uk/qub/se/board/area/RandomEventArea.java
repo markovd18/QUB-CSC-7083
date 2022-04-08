@@ -6,8 +6,9 @@ import uk.qub.se.player.Player;
 public class RandomEventArea implements Area {
 
     @Override
-    public void acceptPlayer(final Player player) {
+    public BoardMovementResult acceptPlayer(final Player player) {
 
+        return null;
     }
 
     @Override

@@ -3,6 +3,8 @@ package uk.qub.se.game;
 import uk.qub.se.board.Board;
 import uk.qub.se.player.Player;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -34,7 +36,14 @@ public class Game {
     }
 
     public void startGame() {
+        final List<Player> activePlayers =  initiateActivePlayers();
         //TODO Game loop
+    }
+
+    private List<Player> initiateActivePlayers() {
+        final var activePlayers = new ArrayList<Player>(players.size());
+        Collections.copy(activePlayers, players);
+        return activePlayers;
     }
 
 }

@@ -6,7 +6,7 @@ public interface Area {
 
     String REGISTRAR_METHOD_NAME = "registerToFactory";
 
-    void acceptPlayer(Player player);
+    BoardMovementResult acceptPlayer(Player player);
 
     void validate() throws IllegalStateException;
 

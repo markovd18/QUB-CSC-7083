@@ -23,8 +23,9 @@ public class FieldArea implements Area {
     }
 
     @Override
-    public void acceptPlayer(Player player) {
+    public BoardMovementResult acceptPlayer(final Player player) {
 
+        return null;
     }
 
     @Override

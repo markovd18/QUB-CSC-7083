@@ -18,8 +18,9 @@ public class StartArea implements Area {
     }
 
     @Override
-    public void acceptPlayer(final Player player) {
+    public BoardMovementResult acceptPlayer(final Player player) {
 
+        return null;
     }
 
     @Override
