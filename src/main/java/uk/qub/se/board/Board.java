@@ -21,9 +21,19 @@ public class Board {
     }
 
     public Area getNextArea(final Area currentArea, final int steps) {
-        int boardSize = areas.size();
+        if (steps < 0) {
+            throw new IllegalArgumentException("Number of steps may not be negative number");
+        }
+        if (currentArea == null) {
+            throw new IllegalArgumentException("Current area reference may not be null");
+        }
+
         int indexOfCurrent = areas.indexOf(currentArea);
-        return areas.get((indexOfCurrent + steps) % boardSize);
+        if (indexOfCurrent < 0) {
+            return null;
+        }
+
+        return areas.get((indexOfCurrent + steps) % areas.size());
     }
 
     public List<Area> getAreas() {

@@ -1,15 +1,14 @@
 package uk.qub.se.board;
 
-import uk.qub.se.board.area.Area;
 import uk.qub.se.board.area.FieldArea;
 
 import java.util.List;
 
 public class Field {
 
-    String name;
+    private String name;
 
-    List<FieldArea> areas;
+    private List<FieldArea> areas;
 
     public Field() {
     }
@@ -17,25 +16,19 @@ public class Field {
     public Field(final String name, final List<FieldArea> areas) {
         this.name = name;
         this.areas = areas;
+        validate();
     }
 
     public void validate() {
         if (name == null || name.isBlank()) {
-            throw new IllegalArgumentException("Field name may not be null nor blank");
+            throw new IllegalStateException("Field name may not be null nor blank");
         }
 
         if (areas == null || areas.isEmpty()) {
-            throw new IllegalArgumentException("Field has to consist of at least one area");
-        }
-
-        validateAreas();
-    }
-
-    private void validateAreas() {
-        for (final Area area : areas) {
-            area.validate();
+            throw new IllegalStateException("Field has to consist of at least one area");
         }
     }
+
     public String getName() {
         return name;
     }

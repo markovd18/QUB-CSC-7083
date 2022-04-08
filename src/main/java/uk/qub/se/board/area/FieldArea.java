@@ -32,11 +32,12 @@ public class FieldArea implements Area {
         if (name == null || name.isBlank()) {
             throw new IllegalStateException("FieldArea name may not be null nor blank");
         }
-        if (catchPhrase == null || name.isBlank()) {
+        if (catchPhrase == null || catchPhrase.isBlank()) {
             throw new IllegalStateException("Catch phrase may not be null nor blank");
         }
-
-        costs.validate();
+        if (costs == null) {
+            throw new IllegalStateException("Area costs may not be null");
+        }
     }
 
     public static void registerToFactory() {

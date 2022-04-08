@@ -7,7 +7,7 @@ public enum AreaStage {
     DEVELOPED_0(DEVELOPED_1),
     NOT_OWNED(DEVELOPED_0);
 
-    private AreaStage nextStage;
+    private final AreaStage nextStage;
 
     AreaStage(AreaStage nextStage) {
         this.nextStage = nextStage;

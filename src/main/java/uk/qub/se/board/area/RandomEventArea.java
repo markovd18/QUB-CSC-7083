@@ -16,6 +16,10 @@ public class RandomEventArea implements Area {
     }
 
     public static void registerToFactory() {
-        AreaFactory.getInstance().registerFactory("random", (json, mapper) -> mapper.readValue(json, RandomEventArea.class));
+        AreaFactory.getInstance().registerFactory("random", (json, mapper) -> {
+            final Area area = mapper.readValue(json, RandomEventArea.class);
+            area.validate();
+            return area;
+        });
     }
 }

@@ -12,7 +12,7 @@ public class EmptyArea implements Area {
 
     @Override
     public void validate() {
-        //TODO validation ?
+        //
     }
 
     public static void registerToFactory() {

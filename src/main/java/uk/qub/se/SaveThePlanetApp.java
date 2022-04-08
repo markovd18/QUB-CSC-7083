@@ -6,8 +6,9 @@ import uk.qub.se.game.Game;
 import uk.qub.se.player.Player;
 import uk.qub.se.player.PlayerLoader;
 
-import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
@@ -30,20 +31,15 @@ public class SaveThePlanetApp {
         }
 
 
-        Random random = new Random(5);
+        Random random = new Random(System.currentTimeMillis());
         Game game = new Game(players, board, random);
         game.startGame();
     }
 
     private static Board loadBoard() {
-        final File file = new File(BOARD_CONFIG_PATH);
-
-        final BoardLoader boardLoader = new BoardLoader(file);
-        return loadBoard(boardLoader);
-    }
-
-    private static Board loadBoard(final BoardLoader boardLoader) {
         try {
+            final InputStream boardConfig = new FileInputStream(BOARD_CONFIG_PATH);
+            final BoardLoader boardLoader = new BoardLoader(boardConfig);
             return boardLoader.loadBoard();
         } catch (IOException e) {
             System.out.println("Board loading failed");

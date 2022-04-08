@@ -27,10 +27,17 @@ public class StartArea implements Area {
         if (initialResources == null || initialResources <= 0){
             throw new IllegalStateException("Start initial resources must be higher then 0.");
         }
+        if (regularGrant != null && regularGrant < 0) {
+            throw new IllegalStateException("Regular start grant may not be negative");
+        }
     }
 
     public static void registerToFactory() {
-        AreaFactory.getInstance().registerFactory("start", (json, mapper) -> mapper.readValue(json, StartArea.class));
+        AreaFactory.getInstance().registerFactory("start", (json, mapper) -> {
+            final Area area = mapper.readValue(json, StartArea.class);
+            area.validate();
+            return area;
+        });
     }
 
     public Integer getInitialResources() {
