@@ -7,8 +7,12 @@ public class EmptyArea implements Area {
 
     @Override
     public BoardMovementResult acceptPlayer(final Player player) {
+        if (player == null) {
+            return null;
+        }
 
-        return null;
+        System.out.println("Alas, nothing happened.");
+        return BoardMovementResult.NEXT_PLAYER_TURN;
     }
 
     @Override
