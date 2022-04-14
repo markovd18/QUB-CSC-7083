@@ -87,6 +87,11 @@ public class PlayerLoader {
             return true;
         }
 
+        if (nickname.length()>10){
+            outputStream.println("Selected nickname is too long. Please enter nickname of 10 or less characters.");
+            return true;
+        }
+
         return false;
     }
 
