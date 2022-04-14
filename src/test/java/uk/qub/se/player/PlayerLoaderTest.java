@@ -50,7 +50,7 @@ public class PlayerLoaderTest {
     @Test
     public void loadsPlayerOnSecondTry_afterDecliningNickname() {
         final int playersToLoad = 1;
-        final var nickname = "Better Nickname";
+        final var nickname = "Nickname2";
 
         final Scanner scanner = new Scanner(IOUtils.toInputStream("Nickname\nq\n" + nickname + "\n\n"));
         final PlayerLoader loader = new PlayerLoader(scanner, System.out, playersToLoad);
@@ -73,7 +73,7 @@ public class PlayerLoaderTest {
     public void doesNotLoadTwoIdenticalNames() {
         final int playersToLoad = 2;
 
-        final Scanner scanner = new Scanner(IOUtils.toInputStream("Nickname\n\nNickname\nOther nickname\n\n"));
+        final Scanner scanner = new Scanner(IOUtils.toInputStream("Nickname\n\nNickname\nnickname2\n\n"));
         final PlayerLoader loader = new PlayerLoader(scanner, System.out, playersToLoad);
         final List<Player> players = loader.loadPlayers();
 
@@ -81,4 +81,18 @@ public class PlayerLoaderTest {
                 () -> assertFalse(() -> players.get(0).getName().equals(players.get(1).getName()),
                         "Players names may not be equal"));
     }
+    @Test
+    public void doesNotLoadNameTooLong(){
+        final var invalidNickname = "ThisNickNameIsTooLong";
+        final String validNickname = "OKNickName";
+        final int numPlayers = 1;
+
+        final Scanner scanner = new Scanner(IOUtils.toInputStream(invalidNickname+"\n"+validNickname+"\n\n"));
+        final PlayerLoader loader = new PlayerLoader(scanner, System.out, numPlayers);
+        final List<Player> players = loader.loadPlayers();
+
+        assertEquals(1, players.size(), "One player with acceptable nickname should be loaded");
+    }
+
+
 }
