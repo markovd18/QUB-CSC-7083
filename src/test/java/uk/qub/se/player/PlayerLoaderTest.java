@@ -81,17 +81,16 @@ public class PlayerLoaderTest {
                 () -> assertFalse(() -> players.get(0).getName().equals(players.get(1).getName()),
                         "Players names may not be equal"));
     }
+
     @Test
     public void doesNotLoadNameTooLong(){
-        final var invalidNickname = "ThisNickNameIsTooLong";
-        final String validNickname = "OKNickName";
-        final int numPlayers = 1;
+        final var invalidNickname = "A".repeat(PlayerLoader.MAXIMUM_NICK_LENGTH + 1);
 
-        final Scanner scanner = new Scanner(IOUtils.toInputStream(invalidNickname+"\n"+validNickname+"\n\n"));
-        final PlayerLoader loader = new PlayerLoader(scanner, System.out, numPlayers);
+        final Scanner scanner = new Scanner(IOUtils.toInputStream(invalidNickname + "\nq\n"));
+        final PlayerLoader loader = new PlayerLoader(scanner, System.out, 1);
         final List<Player> players = loader.loadPlayers();
 
-        assertEquals(1, players.size(), "One player with acceptable nickname should be loaded");
+        assertEquals(0, players.size(), "Player with too long nickname should not be loaded");
     }
 
 

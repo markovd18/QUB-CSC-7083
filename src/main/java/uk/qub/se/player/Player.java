@@ -38,22 +38,12 @@ public class Player {
                 ", Development Points = " + investmentPoints;
     }
 
-    public void updateResources(int res){
-        int newRes = getResources() + res;
-        if(newRes < 0){
-            //PLAYER MUST QUIT THE GAME
-        } else{
-            setResources(newRes);
-        }
+    public void updateResourcesByAmount(final int amount) {
+        setResources(getResources() + amount);
     }
 
-    public void updateInvPts(int inv) {
-        int newInvPts = getInvPoints() + inv;
-        if (newInvPts < 0) {
-            //error state
-        } else {
-            setInvPts(newInvPts);
-        }
+    public void updateInvestmentPointsByAmount(final int amount) {
+        setInvestmentPoints(getInvestmentPoints() + amount);
     }
 
     //getters
@@ -63,7 +53,7 @@ public class Player {
         return resources;
     }
 
-    public int getInvPoints() {
+    public int getInvestmentPoints() {
         return investmentPoints;
     }
 
@@ -74,9 +64,21 @@ public class Player {
     }
 
     //setters
-    private void setResources(int resources) {this.resources = resources; }
+    private void setResources(final int resources) {
+        if (resources < 0) {
+            // error state - throw?
+        }
 
-    private void setInvPts (int inv) {this.investmentPoints = inv;}
+        this.resources = resources;
+    }
+
+    private void setInvestmentPoints(final int investmentPoints) {
+        if (investmentPoints < 0) {
+            // error state - throw?
+        }
+
+        this.investmentPoints = investmentPoints;
+    }
 
 
 

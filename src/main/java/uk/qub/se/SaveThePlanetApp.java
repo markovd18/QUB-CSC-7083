@@ -1,12 +1,17 @@
 package uk.qub.se;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.qub.se.board.Board;
 import uk.qub.se.board.BoardLoader;
+import uk.qub.se.board.area.factory.AreaFactory;
 import uk.qub.se.game.Game;
 import uk.qub.se.player.Player;
 import uk.qub.se.player.PlayerLoader;
+import uk.qub.se.utils.ExitCode;
+import uk.qub.se.utils.ReflectionsFactory;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -27,7 +32,7 @@ public class SaveThePlanetApp {
         if (notEnoughPlayersLoaded(players)) {
             System.out.printf("Minimum number of players required to play the game is %d. " +
                     "Please return once you have enough players.", MIN_PLAYER_NUM);
-            System.exit(1);
+            System.exit(ExitCode.NOT_ENOUGH_PLAYERS.getValue());
         }
 
 
@@ -38,15 +43,20 @@ public class SaveThePlanetApp {
 
     private static Board loadBoard() {
         try {
-            final InputStream boardConfig = new FileInputStream(BOARD_CONFIG_PATH);
-            final BoardLoader boardLoader = new BoardLoader(boardConfig);
+            final BoardLoader boardLoader = createBoardLoader();
             return boardLoader.loadBoard();
         } catch (IOException e) {
-            System.out.println("Board loading failed");
-            System.out.println(e.getMessage());
-            System.exit(3);
+            System.out.printf("Board loading failed.\n%s", e.getMessage());
+            System.exit(ExitCode.CONFIG_ERROR.getValue());
             return null;
         }
+    }
+
+    private static BoardLoader createBoardLoader() throws FileNotFoundException {
+        final InputStream boardConfig = new FileInputStream(BOARD_CONFIG_PATH);
+        final ObjectMapper mapper = new ObjectMapper();
+        final AreaFactory areaFactory = new AreaFactory(new ReflectionsFactory());
+        return new BoardLoader(boardConfig, areaFactory, mapper);
     }
 
     private static List<Player> loadPlayers() {

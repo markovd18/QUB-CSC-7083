@@ -10,6 +10,7 @@ import java.util.Scanner;
 public class PlayerLoader {
 
     public static final String DECLINE_ENTERING_NAME_SYMBOL = "q";
+    public static final int MAXIMUM_NICK_LENGTH = 20;
 
     private final Scanner scanner;
     private final PrintStream outputStream;
@@ -56,7 +57,6 @@ public class PlayerLoader {
         if (nickname == null) return null;
 
         return new Player(nickname);
-
     }
 
     private String loadNickname(final List<Player> loadedPlayers) {
@@ -88,7 +88,16 @@ public class PlayerLoader {
             return true;
         }
 
+        if (isNicknameTooLong(nickname)){
+            outputStream.println("Selected nickname is too long. Please enter nickname of 10 or less characters.");
+            return true;
+        }
+
         return false;
+    }
+
+    private boolean isNicknameTooLong(final String nickname) {
+        return nickname.length() > MAXIMUM_NICK_LENGTH;
     }
 
     private boolean nicknameTaken(final List<Player> loadedPlayers, final String nickname) {

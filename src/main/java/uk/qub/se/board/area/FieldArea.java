@@ -1,5 +1,6 @@
 package uk.qub.se.board.area;
 
+import uk.qub.se.board.area.factory.AreaFactory;
 import uk.qub.se.player.Player;
 
 public class FieldArea implements Area {
@@ -41,7 +42,7 @@ public class FieldArea implements Area {
         }
     }
 
-    public static void registerToFactory() {
+    public static void registerToFactory(final AreaFactory factory) {
         //
     }
 

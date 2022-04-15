@@ -2,12 +2,15 @@ package uk.qub.se.board.area;
 
 import uk.qub.se.board.area.factory.AreaFactory;
 import uk.qub.se.player.Player;
+import uk.qub.se.utils.ValidationUtils;
 
 public class StartArea implements Area {
 
+    public static final String JSON_ATTRIBUTE_NAME = "start";
     private Integer initialResources;
     private Integer regularGrant;
 
+    @SuppressWarnings("unused")
     public StartArea() {
     }
 
@@ -33,8 +36,15 @@ public class StartArea implements Area {
         }
     }
 
-    public static void registerToFactory() {
-        AreaFactory.getInstance().registerFactory("start", (json, mapper) -> {
+    @SuppressWarnings("unused")
+    public static void registerToFactory(final AreaFactory factory) {
+        if (factory == null) {
+            return;
+        }
+
+        factory.registerFactory(JSON_ATTRIBUTE_NAME, (json, mapper) -> {
+            ValidationUtils.validateAreaFactoryMethodParams(json, mapper);
+
             final Area area = mapper.readValue(json, StartArea.class);
             area.validate();
             return area;

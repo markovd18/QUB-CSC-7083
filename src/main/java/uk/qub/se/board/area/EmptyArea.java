@@ -20,7 +20,11 @@ public class EmptyArea implements Area {
         //
     }
 
-    public static void registerToFactory() {
-        AreaFactory.getInstance().registerFactory("empty_area", (json, mapper) -> new EmptyArea());
+    @SuppressWarnings("unused")
+    public static void registerToFactory(final AreaFactory factory) {
+        if (factory == null) {
+            return;
+        }
+        factory.registerFactory("empty_area", (json, mapper) -> new EmptyArea());
     }
 }

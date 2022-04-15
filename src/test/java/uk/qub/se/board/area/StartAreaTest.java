@@ -4,11 +4,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import uk.qub.se.board.area.factory.AreaFactory;
 
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 
 public class StartAreaTest {
 
@@ -23,6 +25,18 @@ public class StartAreaTest {
     public void doesNotThrowWhenValidDepsPassed() {
         assertDoesNotThrow(() -> new StartArea(15, 156),
                 "Constructor should not throw when valid dependencies passed");
+    }
+
+    @Test
+    public void registerToFactoryDoesNotThrow_whenNullAreaFactoryPassed() {
+        assertDoesNotThrow(() -> StartArea.registerToFactory(null),
+                "Passing null area factory should not throw but just return");
+    }
+
+    @Test
+    public void registerToFactoryRegistersFactoryMethodForKey_whenAreaFactoryPassed() {
+        final var areaFactory = mock(AreaFactory.class);
+
     }
 
     public static Stream<Arguments> provideInvalidDeps() {

@@ -137,7 +137,7 @@ public class Game {
         System.out.println(currentPlayer.getName() + " is Rolling Dice...");
 
         //**TO BE DELETED**//
-        currentPlayer.updateInvPts(5);
+        currentPlayer.updateInvestmentPointsByAmount(5);
         addPoints(5);
         System.out.println("Outcome of rolling dice:");
         System.out.println(currentPlayer);

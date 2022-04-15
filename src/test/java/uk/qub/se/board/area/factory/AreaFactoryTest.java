@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import uk.qub.se.utils.ReflectionsFactory;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -16,7 +17,7 @@ public class AreaFactoryTest {
 
     @BeforeEach
     public void init() {
-        factory = AreaFactory.getInstance();
+        factory = new AreaFactory(mock(ReflectionsFactory.class));
     }
 
     @Test

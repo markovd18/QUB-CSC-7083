@@ -1,257 +1,102 @@
 package uk.qub.se.board;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import uk.qub.se.board.area.factory.AreaFactory;
 import uk.qub.se.utils.IOUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class BoardLoaderTest {
 
-    @Test
-    public void throwsWhenNullInputStreamPassed() {
-        assertThrows(IllegalArgumentException.class, () -> new BoardLoader(null),
-                "Constructor should throw IllegalArgument when null input stream passed");
+    @ParameterizedTest
+    @MethodSource("provideIllegalDependencies")
+    public void throwsWhenInvalidDependenciesPassed(final InputStream inputStream, final AreaFactory areaFactory,
+                                                    final ObjectMapper objectMapper,
+                                                    final Class<? extends Throwable> exception, final String message) {
+        assertThrows(exception, () -> new BoardLoader(inputStream, areaFactory, objectMapper), message);
     }
 
     @Test
-    public void doesNotThrowWhenInputStreamPassed() {
-        assertDoesNotThrow(() -> new BoardLoader(IOUtils.toInputStream("empty")),
+    public void doesNotThrowWhenValidDependenciesPassed() {
+        assertDoesNotThrow(() -> new BoardLoader(IOUtils.toInputStream("valid"), mock(AreaFactory.class), mock(ObjectMapper.class)),
                 "Constructor should not throw when valid dependencies passed");
     }
 
-    @ParameterizedTest
-    @MethodSource("provideIllegalJsons")
-    public void throwsIOExceptionWhenIllegalJsonPassed(final String illegalJson) {
-        final BoardLoader loader = new BoardLoader(IOUtils.toInputStream(illegalJson));
-        assertThrows(IOException.class, loader::loadBoard, "Board loading should throw IOException when illegal json passed");
-    }
+    @Test
+    public void throwsIOException_whenObjectMapperFailsToReadJson() throws JsonProcessingException {
+        final var illegalJson = "Hello, world!";
+        final var objectMapper = mock(ObjectMapper.class);
+        when(objectMapper.readTree(illegalJson)).thenThrow(JsonProcessingException.class);
 
-    @ParameterizedTest
-    @MethodSource("provideIllegalConfigurations")
-    public void throwsIllegalStateException_whenIllegalConfigurationPassed(final String illegalConfiguration) {
-        final BoardLoader loader = new BoardLoader(IOUtils.toInputStream(illegalConfiguration));
-        assertThrows(IllegalStateException.class, loader::loadBoard, "Board loading should throw IllegalState when illegal config passed");
+        final BoardLoader loader = new BoardLoader(IOUtils.toInputStream(illegalJson), mock(AreaFactory.class), objectMapper);
+        assertThrows(IOException.class, loader::loadBoard, "Board loading should throw IOException when illegal format passed");
     }
 
     @Test
-    public void createsBoardWhenValidConfigurationPassed() throws IOException {
-        final BoardLoader loader = new BoardLoader(IOUtils.toInputStream(prepareValidConfiguration()));
-        final Board board = loader.loadBoard();
-        assertNotNull(board, "Created board from valid config may not be null");
+    public void throwsIOException_whenConfigurationIsNotJson() throws JsonProcessingException {
+        final var illegalJson = "Hello, world!";
+        final var objectMapper = mock(ObjectMapper.class);
+        when(objectMapper.readTree(illegalJson)).thenReturn(null);
+
+        final BoardLoader loader = new BoardLoader(IOUtils.toInputStream(illegalJson), mock(AreaFactory.class), objectMapper);
+        assertThrows(IOException.class, loader::loadBoard, "Board loading should throw IOException when illegal format passed");
     }
 
-    private String prepareValidConfiguration() {
-        return """
-                {
-                   "start": {
-                     "initialResources": 22,
-                     "regularGrant": 10
-                   },
-                   "field_1": {
-                     "name": "green",
-                     "areas": [
-                       {
-                         "name": "recycling",
-                         "catchPhrase": "Your research in to awesome recycling tech cuts down waste across the globe!",
-                         "costs": {
-                           "initialCost": {
-                             "resourceCost": 12,
-                             "investmentPointsReward": 5
-                           },
-                           "developmentCost": {
-                             "resourceCost": 12,
-                             "investmentPointsReward": 5
-                           },
-                           "masterDevelopmentCost": {
-                             "resourceCost": 12,
-                             "investmentPointsReward": 5
-                           },
-                           "investmentCost": {
-                             "resourceCost": 12,
-                             "investmentPointsReward": 5
-                           }
-                         }
-                       },
-                       {
-                         "name": "re-forestation",
-                         "catchPhrase": "You research new ways to plant bigger, better trees witch suck all the carbon out of the air.",
-                         "costs": {
-                           "initialCost": {
-                             "resourceCost": 12,
-                             "investmentPointsReward": 5
-                           },
-                           "developmentCost": {
-                             "resourceCost": 12,
-                             "investmentPointsReward": 5
-                           },
-                           "masterDevelopmentCost": {
-                             "resourceCost": 12,
-                             "investmentPointsReward": 5
-                           },
-                           "investmentCost": {
-                             "resourceCost": 12,
-                             "investmentPointsReward": 5
-                           }
-                         }
-                       },
-                       {
-                         "name": "Low carbon agriculture",
-                         "catchPhrase": "You research new ways to produce food which dramatically reduces all the carbon produced by farming.",
-                         "costs": {
-                           "initialCost": {
-                             "resourceCost": 12,
-                             "investmentPointsReward": 5
-                           },
-                           "developmentCost": {
-                             "resourceCost": 12,
-                             "investmentPointsReward": 5
-                           },
-                           "masterDevelopmentCost": {
-                             "resourceCost": 12,
-                             "investmentPointsReward": 5
-                           },
-                           "investmentCost": {
-                             "resourceCost": 12,
-                             "investmentPointsReward": 5
-                           }
-                         }
-                       }
-                     ]
-                   },
-                   "empty_area": {},
-                   "field_2": {
-                     "name": "wind",
-                     "areas": [
-                       {
-                         "name": "Wind power",
-                         "catchPhrase": "Your research into wind turbines makes them more powerful, more efficient and the word can rely on them for its power needs!",
-                         "costs": {
-                           "initialCost": {
-                             "resourceCost": 12,
-                             "investmentPointsReward": 5
-                           },
-                           "developmentCost": {
-                             "resourceCost": 12,
-                             "investmentPointsReward": 5
-                           },
-                           "masterDevelopmentCost": {
-                             "resourceCost": 12,
-                             "investmentPointsReward": 5
-                           },
-                           "investmentCost": {
-                             "resourceCost": 12,
-                             "investmentPointsReward": 5
-                           }
-                         }
-                       },
-                       {
-                         "name": "Carbon capture",
-                         "catchPhrase": "You discover new tech to pull carbon out of the atmosphere - saving everyone's ass",
-                         "costs": {
-                           "initialCost": {
-                             "resourceCost": 12,
-                             "investmentPointsReward": 5
-                           },
-                           "developmentCost": {
-                             "resourceCost": 12,
-                             "investmentPointsReward": 5
-                           },
-                           "masterDevelopmentCost": {
-                             "resourceCost": 12,
-                             "investmentPointsReward": 5
-                           },
-                           "investmentCost": {
-                             "resourceCost": 12,
-                             "investmentPointsReward": 5
-                           }
-                         }
-                       }
-                     ]
-                   },
-                   "field_3": {
-                     "name": "water",
-                     "areas": [
-                       {
-                         "name": "Hydro electric power",
-                         "catchPhrase": "Hydro catchPhrase",
-                         "costs": {
-                           "initialCost": {
-                             "resourceCost": 12,
-                             "investmentPointsReward": 5
-                           },
-                           "developmentCost": {
-                             "resourceCost": 12,
-                             "investmentPointsReward": 5
-                           },
-                           "masterDevelopmentCost": {
-                             "resourceCost": 12,
-                             "investmentPointsReward": 5
-                           },
-                           "investmentCost": {
-                             "resourceCost": 12,
-                             "investmentPointsReward": 5
-                           }
-                         }
-                       },
-                       {
-                         "name": "Hydrogen production",
-                         "catchPhrase": "Hydrogen catchPhrase",
-                         "costs": {
-                           "initialCost": {
-                             "resourceCost": 12,
-                             "investmentPointsReward": 5
-                           },
-                           "developmentCost": {
-                             "resourceCost": 12,
-                             "investmentPointsReward": 5
-                           },
-                           "masterDevelopmentCost": {
-                             "resourceCost": 12,
-                             "investmentPointsReward": 5
-                           },
-                           "investmentCost": {
-                             "resourceCost": 12,
-                             "investmentPointsReward": 5
-                           }
-                         }
-                       }
-                     ]
-                   }
-                 }
-                 """;
+    @Test
+    public void throwsIllegalState_whenIllegalAreaNameConfigured() throws IOException {
+        final var areaFactory = mock(AreaFactory.class);
+        final var objectMapper = mock(ObjectMapper.class);
+        final var jsonTree = mock(JsonNode.class);
+        final var iterator = mock(Iterator.class);
+        final var entry = mock(Map.Entry.class);
+        final var entryValue = mock(JsonNode.class);
+
+        final var key = "\"not_start\"";
+        final var jsonBody = "{}";
+        final var json = "{\n" + key + ": " + jsonBody + "\n}";
+        final InputStream inputStream = IOUtils.toInputStream(json);
+
+        when(objectMapper.readTree(inputStream)).thenReturn(jsonTree);
+        //noinspection unchecked
+        when(jsonTree.fields()).thenReturn(iterator);
+        when(iterator.hasNext()).thenReturn(true);
+        when(iterator.next()).thenReturn(entry);
+        when(entry.getKey()).thenReturn(key);
+        when(entry.getValue()).thenReturn(entryValue);
+        when(objectMapper.writeValueAsString(entryValue)).thenReturn(jsonBody);
+        when(areaFactory.construct(key, jsonBody, objectMapper)).thenThrow(IllegalArgumentException.class);
+
+        final var loader = new BoardLoader(inputStream, areaFactory, objectMapper);
+
+        assertThrows(IllegalStateException.class, loader::loadBoard,
+                "Loading board configuration with invalid area name should throw IllegalState");
     }
 
-    public static Stream<Arguments> provideIllegalJsons() {
+
+
+    private static Stream<Arguments> provideIllegalDependencies() {
         return Stream.of(
-                Arguments.of("{"),
-                Arguments.of("}"),
-                Arguments.of("{ param"),
-                Arguments.of("{ param: }"),
-                Arguments.of("{ \"param\": }"),
-                Arguments.of("Hello, world!")
-        );
-    }
-
-    public static Stream<Arguments> provideIllegalConfigurations() {
-        return Stream.of(
-                Arguments.of("{" +
-                        "\"not_start\": {\"initialResources\": 22,\"regularGrant\": 50}," +
-                        "\"field_1\": {\"name\": \"test field\", \"areas\": [" +
-                            "{\"name\": \"test area\", \"catchPhrase\": \"catch me\"}" +
-                        "]}" +
-                        "}"),
-                Arguments.of("{" +
-                        "\"start\": {\"initialResources\": 22,\"regularGrant\": 50}," +
-                        "\"fild\": {}" +
-                        "}")
+                Arguments.of(null, mock(AreaFactory.class), mock(ObjectMapper.class), IllegalArgumentException.class,
+                        "Constructor should throw IllegalArgument when null input stream passed"),
+                Arguments.of(IOUtils.toInputStream("empty"), null, mock(ObjectMapper.class), IllegalArgumentException.class,
+                        "Constructor should throw IllegalArgument when null area factory passed"),
+                Arguments.of(IOUtils.toInputStream("empty"), mock(AreaFactory.class), null, IllegalArgumentException.class,
+                        "Constructor should throw IllegalArgument when null object mapper passed")
         );
     }
 }
