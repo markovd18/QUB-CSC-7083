@@ -56,6 +56,7 @@ public class PlayerLoader {
         if (nickname == null) return null;
 
         return new Player(nickname);
+
     }
 
     private String loadNickname(final List<Player> loadedPlayers) {
@@ -84,11 +85,6 @@ public class PlayerLoader {
 
         if (nicknameTaken(loadedPlayers, nickname)) {
             outputStream.println("Selected nickname is already taken. Please enter unique nickname.");
-            return true;
-        }
-
-        if (nickname.length()>10){
-            outputStream.println("Selected nickname is too long. Please enter nickname of 10 or less characters.");
             return true;
         }
 

@@ -30,6 +30,14 @@ public class Player {
 
     //TODO developCurrentArea methods
 
+    @Override
+    public String toString() {
+        return "Player: " +
+                "Name = " + getName()  +
+                ", Resources = " + resources +
+                ", Development Points = " + investmentPoints;
+    }
+
     public void updateResources(int res){
         int newRes = getResources() + res;
         if(newRes < 0){
