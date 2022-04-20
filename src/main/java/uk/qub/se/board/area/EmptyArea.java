@@ -4,6 +4,7 @@ import uk.qub.se.board.area.factory.AreaFactory;
 import uk.qub.se.player.Player;
 
 public class EmptyArea implements Area {
+    private static final String NAME = "Empty Area";
 
     @Override
     public BoardMovementResult acceptPlayer(final Player player) {
@@ -18,6 +19,11 @@ public class EmptyArea implements Area {
     @Override
     public void validate() {
         //
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
     }
 
     @SuppressWarnings("unused")

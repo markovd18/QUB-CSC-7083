@@ -1,12 +1,10 @@
 package uk.qub.se.game;
 
 import uk.qub.se.board.Board;
+import uk.qub.se.board.area.Area;
 import uk.qub.se.player.Player;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 
 public class Game {
 
@@ -139,15 +137,29 @@ public class Game {
 
     }
 
-    private void displayGameStats(List<Player> activePlayers) {
-        //template code only for testing game loop, to be completed by Jamie
-        System.out.print("\nTotal Investment Points: ");
-        System.out.println(totalInvestment);
-        System.out.println("-----------------------------");
-        System.out.println("\nPlayer stats: ");
-        System.out.println("--------------");
-        for (Player player : activePlayers) {
-            System.out.println("\n " + player.toString());
+    /**
+     * Prints the current game status showing players' names, resources, inv points and owned areas
+     * @param players - the list of active players
+     */
+    private void displayGameStats(List<Player> players) {
+        String lineDiv = "----------------------------------------------------------------------";
+        System.out.printf ("|%-15s |%-15s |%-10s |%-10s |%-15s\n", "PLAYER NAME", "CURRENT POS", "INV POINTS", "RESOURCES", "OWNED AREAS");
+        System.out.println(lineDiv);
+        for (Player p : players){
+            String name = p.getName();
+            String pos = p.getCurrentPosition().getName();
+            int invpts = p.getInvestmentPoints();
+            int res = p.getResources();
+            System.out.printf ("|%-15s |%-15s |%-10d |%-10d |", name, pos, invpts, res);
+
+            Set<Area> playerOwnedAreas = p.getOwnedAreas();
+                for (Area a : playerOwnedAreas){
+                    String areaName = a.getName();
+                    System.out.printf ("%-15s | \n|%-15s |%-15s |%-10s |%-10s", areaName, "", "", "", "");
+                }
+
+
+            System.out.println("\n"+lineDiv);
         }
     }
 

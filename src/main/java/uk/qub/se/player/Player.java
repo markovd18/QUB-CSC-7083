@@ -4,6 +4,7 @@ import uk.qub.se.board.area.Area;
 import uk.qub.se.board.area.BoardMovementResult;
 import uk.qub.se.board.area.Investment;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class Player {
@@ -12,12 +13,12 @@ public class Player {
     private int resources = 0;
     private int investmentPoints = 0;
     private Area currentPosition;
-    private Set<Area> ownedAreas;
+    private Set<Area> ownedAreas = new HashSet<>();
 
 
     /**
      * constructs a player object
-     * @param name
+     * @param name - player nickname
      */
     public Player(final String name) { this.name= name; }
 
@@ -58,9 +59,13 @@ public class Player {
         return investmentPoints;
     }
 
-    public Area getCurrentPosition() { return currentPosition; }
+    public Area getCurrentPosition() {
+
+        return currentPosition;
+    }
 
     public Set<Area> getOwnedAreas() {
+
         return ownedAreas;
     }
 

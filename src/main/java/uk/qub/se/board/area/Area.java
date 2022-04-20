@@ -10,4 +10,5 @@ public interface Area {
 
     void validate() throws IllegalStateException;
 
+    String getName();
 }

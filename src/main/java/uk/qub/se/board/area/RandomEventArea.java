@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 public class RandomEventArea implements Area {
-
+    private static final String NAME = "Random area";
     private List<RandomAction> actions;
     private Iterator<RandomAction> previousEvent;
     private ReflectionsFactory reflectionsFactory;
@@ -48,6 +48,11 @@ public class RandomEventArea implements Area {
     @Override
     public void validate() {
         //??
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
     }
 
     @SuppressWarnings("unused")

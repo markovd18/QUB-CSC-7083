@@ -6,6 +6,7 @@ import uk.qub.se.utils.ValidationUtils;
 
 public class StartArea implements Area {
 
+    public static final String NAME = "Start area";
     public static final String JSON_ATTRIBUTE_NAME = "start";
     private Integer initialResources;
     private Integer regularGrant;
@@ -34,6 +35,11 @@ public class StartArea implements Area {
         if (regularGrant != null && regularGrant < 0) {
             throw new IllegalStateException("Regular start grant may not be negative");
         }
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
     }
 
     @SuppressWarnings("unused")
