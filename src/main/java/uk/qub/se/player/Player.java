@@ -2,6 +2,7 @@ package uk.qub.se.player;
 
 import uk.qub.se.board.area.Area;
 import uk.qub.se.board.area.BoardMovementResult;
+import uk.qub.se.board.area.Investment;
 
 import java.util.Set;
 
@@ -82,7 +83,29 @@ public class Player {
 
 
 
+    public boolean hasEnoughResources(final int amount) {
+        if (amount < 0) {
+            return false;
+        }
+
+        return resources >= amount;
+    }
+
+    public void makeInvestment(final Investment costs) {
+        if (costs == null) {
+            return;
+        }
+
+        updateResourcesByAmount(- costs.resourceCost());
+        updateInvestmentPointsByAmount(costs.investmentPointsReward());
+    }
 
 
+    public void addOwnedArea(final Area area) {
+        if (area == null) {
+            return;
+        }
 
+        ownedAreas.add(area);
+    }
 }

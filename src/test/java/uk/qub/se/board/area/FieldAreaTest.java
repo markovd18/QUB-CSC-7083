@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
@@ -24,6 +25,12 @@ public class FieldAreaTest {
     public void doesNotThrowWhenValidDepsPassed() {
         assertDoesNotThrow(() -> new FieldArea("name", "Funny", mock(AreaCosts.class)),
                 "Constructor should not throw when valid dependencies passed");
+    }
+
+    @Test
+    public void returnsNull_whenAcceptingNull() {
+        assertNull(new FieldArea("name", "Fun", mock(AreaCosts.class)).acceptPlayer(null),
+                "Accepting null should return null");
     }
 
     public static Stream<Arguments> provideInvalidDeps() {
