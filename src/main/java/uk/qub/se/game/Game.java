@@ -99,8 +99,8 @@ public class Game {
                     actionTaken = true;
                 }
                 case "3" -> {
-                    quitGame();
-                    actionTaken = true;
+                    actionTaken=quitGame();
+
                 }
                 default -> System.out.println("Invalid option entered.");
             }
@@ -108,27 +108,21 @@ public class Game {
     }
 
 
-    private void quitGame() {
-        //template code only for testing game loop, to be completed by Jamie
-        int numberSelected;
-        do {
-            Scanner userInput = new Scanner(System.in);
-            System.out.println("Are you sure you want to quit the game?");
-            System.out.println("1. Yes");
-            System.out.println("2. No");
-            while (!userInput.hasNextInt()) {
-                System.out.println("That's not a number!");
-                userInput.next();
-                quitGame();
-            }
-            numberSelected = userInput.nextInt();
-        } while (numberSelected < 0);
+    private boolean quitGame() {
+        boolean actionTaken = false;
+        String numberSelected;
 
-            if (numberSelected == 1) {
-                stop();
-            } else if(numberSelected == 2) {
-                System.out.println("Continuing game, next player");
-            }
+        System.out.println("\nAre you sure you want to quit the game?\nPress 1 to quit\nPress any other key to continue");
+        Scanner userInput = new Scanner(System.in);
+        numberSelected = userInput.nextLine();
+
+        if (numberSelected.equals("1")) {
+            stop();
+            return true;
+        } else {
+            System.out.println("\nOK, back to the game...");
+            return false;
+        }
 
     }
 
