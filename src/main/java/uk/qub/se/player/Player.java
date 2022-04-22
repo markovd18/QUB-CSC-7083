@@ -27,6 +27,7 @@ public class Player {
             throw new IllegalArgumentException("Area to move to may not be null");
         }
 
+        currentPosition = area;
         return area.acceptPlayer(this);
     }
 

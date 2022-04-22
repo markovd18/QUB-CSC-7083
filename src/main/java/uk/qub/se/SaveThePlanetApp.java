@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.qub.se.board.Board;
 import uk.qub.se.board.BoardLoader;
 import uk.qub.se.board.area.factory.AreaFactory;
+import uk.qub.se.dice.Dice;
 import uk.qub.se.game.Game;
 import uk.qub.se.player.Player;
 import uk.qub.se.player.PlayerLoader;
@@ -37,7 +38,8 @@ public class SaveThePlanetApp {
 
 
         Random random = new Random(System.currentTimeMillis());
-        Game game = new Game(players, board, random);
+        Dice dice = new Dice();
+        Game game = new Game(players, board, random, dice);
         game.startGame();
     }
 

@@ -36,6 +36,12 @@ public class Board {
         return areas.get((indexOfCurrent + steps) % areas.size());
     }
 
+    //adding a method to get startArea
+    public Area getStartArea ( ) {
+        List<Area> areas = this.getAreas();
+        Area startArea = areas.get(0);
+        return startArea;
+    }
     public List<Area> getAreas() {
         return areas;
     }

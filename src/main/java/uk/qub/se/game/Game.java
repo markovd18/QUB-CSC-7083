@@ -2,6 +2,7 @@ package uk.qub.se.game;
 
 import uk.qub.se.board.Board;
 import uk.qub.se.board.area.Area;
+import uk.qub.se.dice.Dice;
 import uk.qub.se.player.Player;
 
 import java.util.*;
@@ -14,6 +15,10 @@ public class Game {
 
     private final Random random;
 
+    private Dice dice;
+
+    private Area area;
+
     //NUMBER TO BE CHANGED, FOR TESTING GAME LOOP ONLY
     private static final int MAX_POINTS = 20;
 
@@ -21,14 +26,15 @@ public class Game {
 
     private int totalInvestment = 0;
 
-    public Game(final List<Player> players, final Board board, final Random random) {
-        validateDependencies(players, board, random);
+    public Game(final List<Player> players, final Board board, final Random random, final Dice dice) {
+        validateDependencies(players, board, random, dice);
         this.players = players;
         this.board = board;
         this.random = random;
+        this.dice = dice;
     }
 
-    private void validateDependencies(final List<Player> players, final Board board, final Random random) {
+    private void validateDependencies(final List<Player> players, final Board board, final Random random, final Dice dice) {
         if (players == null || players.isEmpty() || players.size() < 2) {
             throw new IllegalArgumentException("At least 2 players are required to play the game");
         }
@@ -37,6 +43,9 @@ public class Game {
         }
         if (random == null) {
             throw new IllegalArgumentException("Random generator may not be null");
+        }
+        if (dice == null) {
+            throw new IllegalArgumentException("Dice generator may not be null");
         }
 
     }
@@ -60,6 +69,11 @@ public class Game {
         //TODO Game loop
         //set GameStatus to RUNNING
         run();
+
+        //sets all players initial currentPosition to startArea
+        for(Player player : activePlayers){
+            player.moveToArea(board.getStartArea());
+        }
         //show starting stats
         displayGameStats(activePlayers);
         //iterate over each player & Display the menu allowing each player to choose their next move whilst game
@@ -131,11 +145,16 @@ public class Game {
         //**TO BE DELETED**//
         currentPlayer.updateInvestmentPointsByAmount(5);
         addPoints(5);
-        System.out.println("Outcome of rolling dice:");
+
         System.out.println(currentPlayer);
         //**TO BE DELETED**//
+        int result = dice.diceRoll();
+        System.out.println(currentPlayer);
+        currentPlayer.moveToArea(board.getNextArea(currentPlayer.getCurrentPosition(), result));
+
 
     }
+
 
     /**
      * Prints the current game status showing players' names, resources, inv points and owned areas
