@@ -87,7 +87,8 @@ public class BoardTest {
         return Stream.of(
                 Arguments.of(0, areas, reference0, reference0),
                 Arguments.of(3, areas, areas.get(2), areas.get(5)),
-                Arguments.of(5, areas, areas.get(6), areas.get(3))
+                Arguments.of(5, areas, areas.get(6), areas.get(11)),
+                Arguments.of(4, areas, areas.get(10), areas.get((10 + 4) % Board.MIN_AREAS_COUNT))
         );
     }
 }

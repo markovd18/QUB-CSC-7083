@@ -13,7 +13,6 @@ import uk.qub.se.utils.ReflectionsFactory;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Scanner;
@@ -45,7 +44,7 @@ public class SaveThePlanetApp {
         try {
             final BoardLoader boardLoader = createBoardLoader();
             return boardLoader.loadBoard();
-        } catch (IOException e) {
+        } catch (Throwable e) {
             System.out.printf("Board loading failed.\n%s", e.getMessage());
             System.exit(ExitCode.CONFIG_ERROR.getValue());
             return null;

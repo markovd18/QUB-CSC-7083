@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class Board {
 
-    public static final int MIN_AREAS_COUNT = 8;
+    public static final int MIN_AREAS_COUNT = 12;
     private final List<Area> areas;
 
     private final List<Field> fields;
