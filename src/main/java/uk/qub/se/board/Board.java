@@ -2,7 +2,9 @@ package uk.qub.se.board;
 
 import uk.qub.se.board.area.Area;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Board {
 
@@ -11,6 +13,8 @@ public class Board {
 
     private final List<Field> fields;
 
+    private final Map<Area, Field> areaFieldMap = new HashMap<>();
+
     public Board(final List<Area> areas, final List<Field> fields) {
         if (areas == null || areas.size() < MIN_AREAS_COUNT) {
             throw new IllegalArgumentException("Board has to consist of at least " + MIN_AREAS_COUNT + " areas");
@@ -18,6 +22,19 @@ public class Board {
 
         this.areas = areas;
         this.fields = fields;
+        initializeAreaMapping();
+    }
+
+    private void initializeAreaMapping() {
+        if (fields == null) {
+            return;
+        }
+
+        for (final Field field : fields) {
+            for (Area area : field.getAreas()) {
+                areaFieldMap.put(area, field);
+            }
+        }
     }
 
     public Area getNextArea(final Area currentArea, final int steps) {
@@ -38,10 +55,17 @@ public class Board {
 
     //adding a method to get startArea
     public Area getStartArea ( ) {
-        List<Area> areas = this.getAreas();
-        Area startArea = areas.get(0);
-        return startArea;
+        return areas.get(0);
     }
+
+    public Field getParentField(final Area area) {
+        if (area == null) {
+            return null;
+        }
+
+        return areaFieldMap.get(area);
+    }
+
     public List<Area> getAreas() {
         return areas;
     }

@@ -1,11 +1,22 @@
 package uk.qub.se.game;
 
 import uk.qub.se.board.Board;
+import uk.qub.se.board.Field;
 import uk.qub.se.board.area.Area;
 import uk.qub.se.dice.Dice;
 import uk.qub.se.player.Player;
+import uk.qub.se.utils.DevelopmentCandidates;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Game {
 
@@ -13,11 +24,8 @@ public class Game {
 
     private final Board board;
 
-    private final Random random;
-
     private Dice dice;
 
-    private Area area;
 
     //NUMBER TO BE CHANGED, FOR TESTING GAME LOOP ONLY
     private static final int MAX_POINTS = 20;
@@ -26,23 +34,19 @@ public class Game {
 
     private int totalInvestment = 0;
 
-    public Game(final List<Player> players, final Board board, final Random random, final Dice dice) {
-        validateDependencies(players, board, random, dice);
+    public Game(final List<Player> players, final Board board, final Dice dice) {
+        validateDependencies(players, board, dice);
         this.players = players;
         this.board = board;
-        this.random = random;
         this.dice = dice;
     }
 
-    private void validateDependencies(final List<Player> players, final Board board, final Random random, final Dice dice) {
+    private void validateDependencies(final List<Player> players, final Board board, final Dice dice) {
         if (players == null || players.isEmpty() || players.size() < 2) {
             throw new IllegalArgumentException("At least 2 players are required to play the game");
         }
         if (board == null) {
             throw new IllegalArgumentException("Board may not be null");
-        }
-        if (random == null) {
-            throw new IllegalArgumentException("Random generator may not be null");
         }
         if (dice == null) {
             throw new IllegalArgumentException("Dice generator may not be null");
@@ -51,7 +55,7 @@ public class Game {
     }
 
 
-   private enum GameStatus {
+    private enum GameStatus {
 
         RUNNING, STOPPED
     }
@@ -121,7 +125,6 @@ public class Game {
 
 
     private boolean quitGame() {
-        boolean actionTaken = false;
         String numberSelected;
 
         System.out.println("\nAre you sure you want to quit the game?\nPress 1 to quit\nPress any other key to continue");
@@ -142,17 +145,8 @@ public class Game {
     private void rollDice(Player currentPlayer) {
         System.out.println(currentPlayer.getName() + " is Rolling Dice...");
 
-        //**TO BE DELETED**//
-        currentPlayer.updateInvestmentPointsByAmount(5);
-        addPoints(5);
-
-        System.out.println(currentPlayer);
-        //**TO BE DELETED**//
         int result = dice.diceRoll();
-        System.out.println(currentPlayer);
         currentPlayer.moveToArea(board.getNextArea(currentPlayer.getCurrentPosition(), result));
-
-
     }
 
 
@@ -208,12 +202,82 @@ public class Game {
 
     }
 
-
-
     private List<Player> initiateActivePlayers() {
         final List<Player> activePlayers = new ArrayList<>();
         activePlayers.addAll(players);
         return activePlayers;
     }
 
+    /**
+     * Lists through all areas owned by {@code player}, checks whether he owns some {@link Field} entirely and
+     * returns all owned areas that are part of those fields.
+     *
+     * This method is to be used by the {@code developArea} functionality.
+     * @param player player whose areas to check
+     * @return list of areas that may be developed
+     */
+    private List<Area> getDevelopableAreas(final Player player) {
+        final Set<Area> remainingAreas = new HashSet<>(player.getOwnedAreas());
+        final Set<Field> fields = getParentFields(remainingAreas);
+
+        final Map<Area, DevelopmentCandidates> candidatesMap = createCandidatesMap(remainingAreas, fields);
+        checkCandidates(remainingAreas, candidatesMap);
+
+        return collectDevelopableAreas(candidatesMap);
+    }
+
+    private Set<Field> getParentFields(final Set<Area> areas) {
+        return areas.stream()
+                .map(board::getParentField)
+                .collect(Collectors.toSet());
+    }
+
+    private List<Area> collectDevelopableAreas(final Map<Area, DevelopmentCandidates> candidatesMap) {
+        final List<Area> developableAreas = new LinkedList<>();
+        for (DevelopmentCandidates candidates : getDistinctMapValues(candidatesMap)) {
+            if (candidates.areAllFound()) {
+                developableAreas.addAll(candidates.getFoundCandidates());
+            }
+        }
+
+        return developableAreas;
+    }
+
+    private HashSet<DevelopmentCandidates> getDistinctMapValues(final Map<Area, DevelopmentCandidates> candidatesMap) {
+        return new HashSet<>(candidatesMap.values());
+    }
+
+    private void checkCandidates(final Set<Area> remainingAreas, final Map<Area, DevelopmentCandidates> candidatesMap) {
+        for (Area remainingArea : remainingAreas) {
+            candidatesMap.get(remainingArea).checkCandidate(remainingArea);
+        }
+    }
+
+    private Map<Area, DevelopmentCandidates> createCandidatesMap(final Set<Area> remainingAreas,
+                                                                 final Set<Field> fields) {
+        final Map<Area, DevelopmentCandidates> candidatesMap = new HashMap<>();
+        final Set<Area> tempRemainingAreas = new HashSet<>(remainingAreas);
+
+        for (final Field field : fields) {
+            addCandidates(candidatesMap, tempRemainingAreas, field);
+        }
+
+        return candidatesMap;
+    }
+
+    private void addCandidates(final Map<Area, DevelopmentCandidates> candidatesMap,
+                               final Set<Area> tempRemainingAreas,
+                               final Field field) {
+        final List<Area> fieldAreas = new ArrayList<>(field.getAreas());
+        final var candidates = new DevelopmentCandidates(fieldAreas);
+
+        final Iterator<Area> it = tempRemainingAreas.iterator();
+        while (it.hasNext()) {
+            final Area tempArea = it.next();
+            if (board.getParentField(tempArea).equals(field)) {
+                candidatesMap.put(tempArea, candidates);
+                it.remove();
+            }
+        }
+    }
 }

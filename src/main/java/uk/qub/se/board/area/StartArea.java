@@ -57,10 +57,12 @@ public class StartArea implements Area {
         });
     }
 
+    @SuppressWarnings("unused")
     public Integer getInitialResources() {
         return initialResources;
     }
 
+    @SuppressWarnings("unused")
     public Integer getRegularGrant() {
         return regularGrant;
     }

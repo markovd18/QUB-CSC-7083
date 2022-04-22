@@ -16,7 +16,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.Random;
 import java.util.Scanner;
 
 
@@ -37,9 +36,8 @@ public class SaveThePlanetApp {
         }
 
 
-        Random random = new Random(System.currentTimeMillis());
         Dice dice = new Dice();
-        Game game = new Game(players, board, random, dice);
+        Game game = new Game(players, board, dice);
         game.startGame();
     }
 
