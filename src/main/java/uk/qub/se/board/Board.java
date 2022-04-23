@@ -1,6 +1,7 @@
 package uk.qub.se.board;
 
 import uk.qub.se.board.area.Area;
+import uk.qub.se.board.area.StartArea;
 
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +11,7 @@ public class Board {
 
     public static final int MIN_AREAS_COUNT = 12;
     private final List<Area> areas;
+    private final StartArea startArea;
 
     private final List<Field> fields;
 
@@ -20,9 +22,18 @@ public class Board {
             throw new IllegalArgumentException("Board has to consist of at least " + MIN_AREAS_COUNT + " areas");
         }
 
+        if (!isFirstAreaStartArea(areas)) {
+            throw new IllegalArgumentException("First area on the board has to be the start area");
+        }
+
+        this.startArea = (StartArea) areas.get(0);
         this.areas = areas;
         this.fields = fields;
         initializeAreaMapping();
+    }
+
+    private boolean isFirstAreaStartArea(final List<Area> areas) {
+        return areas.get(0) instanceof StartArea;
     }
 
     private void initializeAreaMapping() {
@@ -53,9 +64,18 @@ public class Board {
         return areas.get((indexOfCurrent + steps) % areas.size());
     }
 
+    public boolean wouldPassStartArea(final Area initialPosition, final int steps) {
+        final int indexOfCurrent = areas.indexOf(initialPosition);
+        if (indexOfCurrent < 0) {
+            return false;
+        }
+
+        return (indexOfCurrent + steps) > areas.size();
+    }
+
     //adding a method to get startArea
-    public Area getStartArea ( ) {
-        return areas.get(0);
+    public StartArea getStartArea () {
+        return startArea;
     }
 
     public Field getParentField(final Area area) {

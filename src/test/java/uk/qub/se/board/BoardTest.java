@@ -5,6 +5,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import uk.qub.se.board.area.Area;
+import uk.qub.se.board.area.StartArea;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,9 +74,12 @@ public class BoardTest {
 
     private static List<Area> prepareAreas() {
         final List<Area> areas = new ArrayList<>(Board.MIN_AREAS_COUNT);
-        for (int i = 0; i < Board.MIN_AREAS_COUNT; i++) {
+        areas.add(mock(StartArea.class));
+
+        for (int i = 0; i < (Board.MIN_AREAS_COUNT - 1); i++) {
             areas.add(mock(Area.class));
         }
+
         return areas;
     }
 

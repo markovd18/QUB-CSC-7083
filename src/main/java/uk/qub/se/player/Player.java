@@ -27,8 +27,9 @@ public class Player {
             throw new IllegalArgumentException("Area to move to may not be null");
         }
 
+        final BoardMovementResult result = area.acceptPlayer(this);
         currentPosition = area;
-        return area.acceptPlayer(this);
+        return result;
     }
 
     //TODO developCurrentArea methods

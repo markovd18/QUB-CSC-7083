@@ -145,8 +145,14 @@ public class Game {
     private void rollDice(Player currentPlayer) {
         System.out.println(currentPlayer.getName() + " is Rolling Dice...");
 
-        int result = dice.diceRoll();
-        currentPlayer.moveToArea(board.getNextArea(currentPlayer.getCurrentPosition(), result));
+        final int result = dice.diceRoll();
+        final Area currentPosition = currentPlayer.getCurrentPosition();
+        if (board.wouldPassStartArea(currentPosition, result)) {
+            currentPlayer.updateResourcesByAmount(board.getStartArea().getRegularGrant());
+        }
+
+        currentPlayer.moveToArea(board.getNextArea(currentPosition, result));
+        //TODO check result and act accordingly
     }
 
 

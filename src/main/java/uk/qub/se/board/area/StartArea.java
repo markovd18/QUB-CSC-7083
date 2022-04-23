@@ -23,8 +23,26 @@ public class StartArea implements Area {
 
     @Override
     public BoardMovementResult acceptPlayer(final Player player) {
+        if (player == null) {
+            return null;
+        }
 
-        return null;
+        final int resourceAmount = getResourcesToAddToPlayer(player);
+        player.updateResourcesByAmount(resourceAmount);
+
+        return BoardMovementResult.NEXT_PLAYER_TURN;
+    }
+
+    private int getResourcesToAddToPlayer(final Player player) {
+        if (playerJustStarted(player)) {
+            return initialResources;
+        }
+
+        return regularGrant;
+    }
+
+    private boolean playerJustStarted(final Player player) {
+        return player.getCurrentPosition() == null;
     }
 
     @Override
