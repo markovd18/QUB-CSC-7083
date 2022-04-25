@@ -1,22 +1,18 @@
 package uk.qub.se.game;
 
 import uk.qub.se.board.Board;
-import uk.qub.se.board.Field;
 import uk.qub.se.board.area.Area;
+import uk.qub.se.board.area.BoardMovementResult;
+import uk.qub.se.board.area.DevelopableArea;
 import uk.qub.se.dice.Dice;
 import uk.qub.se.player.Player;
-import uk.qub.se.utils.DevelopmentCandidates;
+import uk.qub.se.utils.GameUtils;
+import uk.qub.se.utils.PrintUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class Game {
 
@@ -24,11 +20,9 @@ public class Game {
 
     private final Board board;
 
-    private Dice dice;
+    private final Dice dice;
 
-
-    //NUMBER TO BE CHANGED, FOR TESTING GAME LOOP ONLY
-    private static final int MAX_POINTS = 20;
+    private static final int MAX_POINTS = 100;
 
     private GameStatus status;
 
@@ -64,121 +58,183 @@ public class Game {
        return totalInvestment;
     }
 
-    private void addPoints(int pointsToAdd){
+    public void addPoints(int pointsToAdd){
         totalInvestment = totalInvestment + pointsToAdd;
     }
 
     public void startGame() {
         final List<Player> activePlayers = initiateActivePlayers();
-        //TODO Game loop
         //set GameStatus to RUNNING
         run();
 
         //sets all players initial currentPosition to startArea
         for(Player player : activePlayers){
-            player.moveToArea(board.getStartArea());
+            player.moveToArea(board.getStartArea(), this);
         }
         //show starting stats
         displayGameStats(activePlayers);
         //iterate over each player & Display the menu allowing each player to choose their next move whilst game
         //is in play only
-         do{
-             for(Player player : activePlayers){
-                 if(isGameRunning() && isInvestmentPointsWithinLimit()){
-                     displayMenu(activePlayers, player);
-                 }
-             }
-         }while(isGameRunning() && isInvestmentPointsWithinLimit());
+         do {
+             iterateThroughActivePlayers(activePlayers);
+         } while(isGameRunning() && isInvestmentPointsWithinLimit());
 
         System.out.println("Game has ended with final stats:");
         System.out.println("-------------------------------");
-        displayGameStats(activePlayers);
+        displayGameStats(players);
     }
 
-    private void displayMenu(List<Player> activePlayers, Player currentPlayer) {
-        boolean actionTaken = false;
-        Scanner scanner = new Scanner(System.in);   // TODO replace with UI API calls
+    private void iterateThroughActivePlayers(final List<Player> activePlayers) {
+        final Iterator<Player> iterator = activePlayers.iterator();
 
-        while (!actionTaken) {
-            System.out.println( "\n " + currentPlayer.getName() + " Enter your next move:");
-            System.out.println("--------------------------------");
-            System.out.println("1. Display Stats");
-            System.out.println("2. Roll Dice");
-            System.out.println("3. Quit Game");
-
-            final String userInput = scanner.nextLine();
-
-            switch (userInput) {
-                case "1" -> displayGameStats(activePlayers);
-                case "2" -> {
-                    rollDice(currentPlayer);
-                    actionTaken = true;
-                }
-                case "3" -> {
-                    actionTaken=quitGame();
-
-                }
-                default -> System.out.println("Invalid option entered.");
+        while (iterator.hasNext()) {
+            final Player currentPlayer = iterator.next();
+            if(isGameRunning() && isInvestmentPointsWithinLimit()){
+                final BoardMovementResult result = displayMenu(activePlayers, currentPlayer);
+                handlePlayerActionResult(result, iterator);
             }
+
         }
     }
 
+    private void handlePlayerActionResult(final BoardMovementResult result, final Iterator<Player> iterator) {
+        switch (result) {
+            case GAME_OVER -> stop();
+            case PLAYER_GAME_OVER -> iterator.remove();
+        }
+    }
 
-    private boolean quitGame() {
-        String numberSelected;
+    private BoardMovementResult displayMenu(final List<Player> activePlayers, final Player currentPlayer) {
+        BoardMovementResult action = BoardMovementResult.SAME_PLAYER_TURN;
 
-        System.out.println("\nAre you sure you want to quit the game?\nPress 1 to quit\nPress any other key to continue");
+        final List<DevelopableArea> developableAreas = GameUtils.getDevelopableAreas(currentPlayer, board);
+        while (action == BoardMovementResult.SAME_PLAYER_TURN) {
+            action = displayUserMenu(activePlayers, currentPlayer, developableAreas);
+        }
+
+        return action;
+    }
+
+    private BoardMovementResult displayUserMenu(final List<Player> activePlayers, final Player currentPlayer, List<DevelopableArea> developableAreas) {
+        PrintUtils.printMenuOptions(currentPlayer, developableAreas);
+
+        Scanner scanner = new Scanner(System.in);
+        final String userInput = scanner.nextLine();
+
+        return processUserInput(activePlayers, currentPlayer, developableAreas, userInput);
+    }
+
+    private BoardMovementResult processUserInput(final List<Player> activePlayers,
+                                                 final Player currentPlayer,
+                                                 final List<DevelopableArea> developableAreas,
+                                                 final String userInput) {
+        return switch (userInput) {
+            case "1" -> handleDisplayGameStatsOption(activePlayers);
+            case "2" -> rollDice(currentPlayer);
+            case "3" -> quitGame();
+            case "4" -> handleDevelopAreaOption(currentPlayer, developableAreas);
+            default -> handleInvalidOption();
+        };
+    }
+
+    private BoardMovementResult handleDisplayGameStatsOption(final List<Player> activePlayers) {
+        displayGameStats(activePlayers);
+        return BoardMovementResult.SAME_PLAYER_TURN;
+    }
+
+    private BoardMovementResult handleDevelopAreaOption(final Player currentPlayer,
+                                                        final List<DevelopableArea> developableAreas) {
+        if (developableAreas.isEmpty()) {
+            System.out.println("Invalid option entered.");
+            return BoardMovementResult.SAME_PLAYER_TURN;
+        }
+
+        return displayAreaDevelopmentMenu(currentPlayer, developableAreas);
+    }
+
+    private BoardMovementResult handleInvalidOption() {
+        System.out.println("Invalid option entered.");
+        return BoardMovementResult.SAME_PLAYER_TURN;
+    }
+
+    private BoardMovementResult quitGame() {
+        System.out.println("\nAre you sure you want to quit the game?\nPress 'Enter' to quit\nPress any other key to continue");
         Scanner userInput = new Scanner(System.in);
-        numberSelected = userInput.nextLine();
 
-        if (numberSelected.equals("1")) {
-            stop();
-            return true;
-        } else {
-            System.out.println("\nOK, back to the game...");
-            return false;
+        final String numberSelected = userInput.nextLine();
+        if (numberSelected.isBlank()) {
+            System.out.println("You chickened out. You chicken... Planet's dead. Hope you're happy.");
+            return BoardMovementResult.GAME_OVER;
         }
 
+        System.out.println("\nOK, back to the game...");
+        return BoardMovementResult.SAME_PLAYER_TURN;
     }
 
 
-    private void rollDice(Player currentPlayer) {
-        System.out.println(currentPlayer.getName() + " is Rolling Dice...");
+    private BoardMovementResult rollDice(Player currentPlayer) {
+        System.out.println("\n" + currentPlayer.getName() + " is Rolling Dice...");
 
         final int result = dice.diceRoll();
         final Area currentPosition = currentPlayer.getCurrentPosition();
         if (board.wouldPassStartArea(currentPosition, result)) {
-            currentPlayer.updateResourcesByAmount(board.getStartArea().getRegularGrant());
+            final int regularGrant = board.getStartArea().getRegularGrant();
+            System.out.printf("You passed the start area. You receive the regular grant of %d resources.\n", regularGrant);
+            currentPlayer.updateResourcesByAmount(regularGrant);
         }
 
-        currentPlayer.moveToArea(board.getNextArea(currentPosition, result));
-        //TODO check result and act accordingly
+        return currentPlayer.moveToArea(board.getNextArea(currentPosition, result), this);
     }
 
+    private BoardMovementResult displayAreaDevelopmentMenu(final Player currentPlayer, final List<DevelopableArea> developableAreas) {
+        if (developableAreas.isEmpty()) {
+            return BoardMovementResult.SAME_PLAYER_TURN;
+        }
+
+        Scanner input = new Scanner(System.in);
+        System.out.println("\nYou are eligible to develop within these areas.");
+        boolean selected = false;
+        while (!selected) {
+            System.out.println("\nPlease select which area you wish to develop or press 'q' to return: ");
+            PrintUtils.printDevelopableAreasList(developableAreas);
+
+            final String inputString = input.nextLine();
+            if (inputString.equals("q")) {
+                return BoardMovementResult.SAME_PLAYER_TURN;
+            }
+
+            int areaSelected;
+            try {
+                areaSelected = Integer.parseInt(inputString);
+            } catch (final NumberFormatException e) {
+                System.out.println("Invalid option selected");
+                continue;
+            }
+
+            if (areaSelected > developableAreas.size()) {
+                System.out.println("Invalid option selected");
+                continue;
+            }
+
+            DevelopableArea areaToDevelop = developableAreas.get(areaSelected - 1);
+            System.out.println("\nYou have selected " + areaToDevelop.getName() + " to develop");
+            areaToDevelop.developArea(currentPlayer);
+            selected = true;
+        }
+
+        return BoardMovementResult.NEXT_PLAYER_TURN;
+    }
 
     /**
      * Prints the current game status showing players' names, resources, inv points and owned areas
      * @param players - the list of active players
      */
-    private void displayGameStats(List<Player> players) {
-        String lineDiv = "----------------------------------------------------------------------";
-        System.out.printf ("|%-15s |%-15s |%-10s |%-10s |%-15s\n", "PLAYER NAME", "CURRENT POS", "INV POINTS", "RESOURCES", "OWNED AREAS");
-        System.out.println(lineDiv);
-        for (Player p : players){
-            String name = p.getName();
-            String pos = p.getCurrentPosition().getName();
-            int invpts = p.getInvestmentPoints();
-            int res = p.getResources();
-            System.out.printf ("|%-15s |%-15s |%-10d |%-10d |", name, pos, invpts, res);
+    private void displayGameStats(final List<Player> players) {
+        PrintUtils.printGameInfoHeader(totalInvestment, MAX_POINTS);
 
-            Set<Area> playerOwnedAreas = p.getOwnedAreas();
-                for (Area a : playerOwnedAreas){
-                    String areaName = a.getName();
-                    System.out.printf ("%-15s | \n|%-15s |%-15s |%-10s |%-10s", areaName, "", "", "", "");
-                }
-
-
-            System.out.println("\n"+lineDiv);
+        for (Player p : players) {
+            PrintUtils.printPlayerStats(p);
+            PrintUtils.printLineDiv();
         }
     }
 
@@ -199,91 +255,14 @@ public class Game {
     }
 
     private boolean isInvestmentPointsWithinLimit() {
-
         if (getPoints() > MAX_POINTS) {
-            System.out.println("Max investment points reached");
+            System.out.println("Max investment points reached! You saved the planet! You deserve a hot chocolate.");
             stop();
         }
         return isGameRunning();
-
     }
 
     private List<Player> initiateActivePlayers() {
-        final List<Player> activePlayers = new ArrayList<>();
-        activePlayers.addAll(players);
-        return activePlayers;
-    }
-
-    /**
-     * Lists through all areas owned by {@code player}, checks whether he owns some {@link Field} entirely and
-     * returns all owned areas that are part of those fields.
-     *
-     * This method is to be used by the {@code developArea} functionality.
-     * @param player player whose areas to check
-     * @return list of areas that may be developed
-     */
-    private List<Area> getDevelopableAreas(final Player player) {
-        final Set<Area> remainingAreas = new HashSet<>(player.getOwnedAreas());
-        final Set<Field> fields = getParentFields(remainingAreas);
-
-        final Map<Area, DevelopmentCandidates> candidatesMap = createCandidatesMap(remainingAreas, fields);
-        checkCandidates(remainingAreas, candidatesMap);
-
-        return collectDevelopableAreas(candidatesMap);
-    }
-
-    private Set<Field> getParentFields(final Set<Area> areas) {
-        return areas.stream()
-                .map(board::getParentField)
-                .collect(Collectors.toSet());
-    }
-
-    private List<Area> collectDevelopableAreas(final Map<Area, DevelopmentCandidates> candidatesMap) {
-        final List<Area> developableAreas = new LinkedList<>();
-        for (DevelopmentCandidates candidates : getDistinctMapValues(candidatesMap)) {
-            if (candidates.areAllFound()) {
-                developableAreas.addAll(candidates.getFoundCandidates());
-            }
-        }
-
-        return developableAreas;
-    }
-
-    private HashSet<DevelopmentCandidates> getDistinctMapValues(final Map<Area, DevelopmentCandidates> candidatesMap) {
-        return new HashSet<>(candidatesMap.values());
-    }
-
-    private void checkCandidates(final Set<Area> remainingAreas, final Map<Area, DevelopmentCandidates> candidatesMap) {
-        for (Area remainingArea : remainingAreas) {
-            candidatesMap.get(remainingArea).checkCandidate(remainingArea);
-        }
-    }
-
-    private Map<Area, DevelopmentCandidates> createCandidatesMap(final Set<Area> remainingAreas,
-                                                                 final Set<Field> fields) {
-        final Map<Area, DevelopmentCandidates> candidatesMap = new HashMap<>();
-        final Set<Area> tempRemainingAreas = new HashSet<>(remainingAreas);
-
-        for (final Field field : fields) {
-            addCandidates(candidatesMap, tempRemainingAreas, field);
-        }
-
-        return candidatesMap;
-    }
-
-    private void addCandidates(final Map<Area, DevelopmentCandidates> candidatesMap,
-                               final Set<Area> tempRemainingAreas,
-                               final Field field) {
-        final List<Area> fieldAreas = new ArrayList<>(field.getAreas());
-        final var candidates = new DevelopmentCandidates(fieldAreas);
-
-        final Iterator<Area> it = tempRemainingAreas.iterator();
-        while (it.hasNext()) {
-            final Area tempArea = it.next();
-            if (board.getParentField(tempArea).equals(field)) {
-                candidatesMap.put(tempArea, candidates);
-                it.remove();
-            }
-        }
+        return new ArrayList<>(players);
     }
 }

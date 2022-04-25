@@ -1,6 +1,6 @@
 package uk.qub.se.utils;
 
-import uk.qub.se.board.area.Area;
+import uk.qub.se.board.area.DevelopableArea;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,10 +8,10 @@ import java.util.Iterator;
 
 public class DevelopmentCandidates {
 
-    private final Collection<Area> candidates;
-    private final Collection<Area> foundCandidates;
+    private final Collection<DevelopableArea> candidates;
+    private final Collection<DevelopableArea> foundCandidates;
 
-    public DevelopmentCandidates(final Collection<Area> candidates) {
+    public DevelopmentCandidates(final Collection<DevelopableArea> candidates) {
         if (candidates == null) {
             throw new IllegalArgumentException("Candidates collection may not be null");
         }
@@ -24,14 +24,14 @@ public class DevelopmentCandidates {
         return candidates.isEmpty();
     }
 
-    public Collection<Area> getFoundCandidates() {
+    public Collection<DevelopableArea> getFoundCandidates() {
         return foundCandidates;
     }
 
-    public void checkCandidate(final Area candidate) {
-        final Iterator<Area> it = candidates.iterator();
+    public void checkCandidate(final DevelopableArea candidate) {
+        final Iterator<DevelopableArea> it = candidates.iterator();
         while (it.hasNext()) {
-            final Area area = it.next();
+            final DevelopableArea area = it.next();
             if (area.equals(candidate)) {
                 it.remove();
                 foundCandidates.add(area);

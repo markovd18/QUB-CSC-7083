@@ -83,7 +83,7 @@ public class Board {
             return null;
         }
 
-        return areaFieldMap.get(area);
+        return areaFieldMap.getOrDefault(area, null);
     }
 
     public List<Area> getAreas() {

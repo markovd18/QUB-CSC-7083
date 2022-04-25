@@ -13,6 +13,8 @@ public class IncrementResources implements RandomAction {
             throw new IllegalArgumentException("Player to increment resources to may not be null");
         }
 
+        System.out.printf("\nYou showed initiative while cleaning local polluted beaches. You receive %d resources.\n", AMOUNT_TO_INCREMENT);
+        System.out.printf("You currently have %d resources.\n", player.getResources());
         player.updateResourcesByAmount(AMOUNT_TO_INCREMENT);
         return BoardMovementResult.NEXT_PLAYER_TURN;
     }

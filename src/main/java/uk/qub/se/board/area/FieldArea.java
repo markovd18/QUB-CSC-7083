@@ -5,7 +5,7 @@ import uk.qub.se.player.Player;
 
 import java.util.Scanner;
 
-public class FieldArea implements Area {
+public class FieldArea implements DevelopableArea {
 
     private AreaStage developmentStage = AreaStage.NOT_OWNED;
 
@@ -38,10 +38,8 @@ public class FieldArea implements Area {
     }
 
     private BoardMovementResult acceptValidPlayer(final Player acceptedPlayer) {
-        // TODO replace with UI API calls
-        System.out.printf("You have landed on %s. %s\n", name, catchPhrase);
+        System.out.printf("\nYou have landed on %s.\n%s\n", name, catchPhrase);
         if (isPlayerOwner(acceptedPlayer)) {
-            // TODO replace with UI API calls
             System.out.println("This area is in your ownership. Welcome home.");
             return BoardMovementResult.NEXT_PLAYER_TURN;
         }
@@ -56,10 +54,9 @@ public class FieldArea implements Area {
     }
 
     private void proposeInvestmentOpportunity(final Player acceptedPlayer) {
-        // TODO this whole user communication to be replaced with injected UI object API calls
         final Investment initialCosts = costs.initialCost();
-        System.out.println("The area is not owned by any player.");
-        System.out.printf("This area costs %d resources to acquire. You have currently have %d resources.\n",
+        System.out.println("\nThe area is not owned by any player.");
+        System.out.printf("This area costs %d resources to acquire. You currently have %d resources.\n",
                 initialCosts.resourceCost(), acceptedPlayer.getResources());
 
         if (playerDoesNotHaveEnoughResources(acceptedPlayer, initialCosts.resourceCost())) {
@@ -67,28 +64,30 @@ public class FieldArea implements Area {
             return;
         }
 
-        performDevelopmentProcess(acceptedPlayer, initialCosts);
+        performDevelopmentProcess(acceptedPlayer, initialCosts, true);
     }
 
-    private void performDevelopmentProcess(final Player investor, final Investment costs) {
-        //TODO this is identical to what will be done in area (major) development - refactor in a way that it is reusable
-        //TODO replace with UI API calls
+    private void performDevelopmentProcess(final Player investor, final Investment costs, final boolean isAcquisition) {
+        final String processName = isAcquisition ? "acquisition" : "development";
         Scanner scanner = new Scanner(System.in);
-        System.out.printf("By acquisition you receive %d investment points. Do you wish to acquire this area?\n", costs.investmentPointsReward());
-        System.out.println("Press 'Enter' to acquire the area or anything else to decline: ");
+
+        System.out.printf("By %s you receive %d investment points. Do you wish proceed?\n", processName, costs.investmentPointsReward());
+        System.out.printf("Press 'Enter' to confirm the %s or anything else to decline: ", processName);
         final String acceptance = scanner.nextLine();
         if (!acceptance.isBlank()) {
-            System.out.println("Area acquisition declined.");
+            System.out.printf("\nArea %s declined.\n", processName);
             return;
         }
 
-        //TODO update global investment points state
         investor.makeInvestment(costs);
-        investor.addOwnedArea(this);
-        owner = investor;
+        if (isAcquisition) {
+            investor.addOwnedArea(this);
+            owner = investor;
+        }
         developmentStage = developmentStage.getNextStage();
-        System.out.printf("Area acquired. You gain %d investment points. You are left with %d resources and %d investment points.\n",
-                costs.investmentPointsReward(), investor.getResources(), investor.getInvestmentPoints());
+        System.out.printf("\nArea %s completed. You gain %d investment points. You are left with %d resources and %d investment points.\n",
+                processName, costs.investmentPointsReward(), investor.getResources(), investor.getInvestmentPoints());
+        System.out.printf("Current area stage is %s.\n", developmentStage.name());
     }
 
     private boolean playerDoesNotHaveEnoughResources(final Player acceptedPlayer, final Integer resourceAmount) {
@@ -98,15 +97,13 @@ public class FieldArea implements Area {
     private BoardMovementResult forcePlayerToInvest(final Player acceptedPlayer) {
         final Investment investmentCosts = costs.investmentCost();
         final int resourceCost = investmentCosts.resourceCost();
-        // TODO UI API
-        System.out.printf("The area is owned by %s. You have to make an investment into their efforts to save the planet. Required investment is %d resources. \n",
+        System.out.printf("\nThe area is owned by %s. \nYou have to make an investment into their efforts to save the planet. Required investment is %d resources. \n",
                 owner.getName(), resourceCost);
         if (playerDoesNotHaveEnoughResources(acceptedPlayer, resourceCost)) {
-            System.out.println("You do not have enough resources to invest. You declare bankruptcy. Game over.");
+            System.out.println("\nYou do not have enough resources to invest. You declare bankruptcy. Game over.");
             return BoardMovementResult.PLAYER_GAME_OVER;
         }
 
-        //TODO update global investment points state
         acceptedPlayer.makeInvestment(investmentCosts);
         owner.updateResourcesByAmount(resourceCost);
         System.out.printf("Investment made. %d investment points acquired. You are left with %d resources and %d investment points.\n",
@@ -133,7 +130,7 @@ public class FieldArea implements Area {
     }
 
     private boolean isPlayerOwner(final Player acceptedPlayer) {
-        return acceptedPlayer.equals(owner);
+        return acceptedPlayer != null && acceptedPlayer.equals(owner);
     }
 
     private Investment getCurrentDevelopmentCosts() {
@@ -164,11 +161,41 @@ public class FieldArea implements Area {
         return name;
     }
 
+    @SuppressWarnings("unused")
     public String getCatchPhrase() {
         return catchPhrase;
     }
 
+    @SuppressWarnings("unused")
     public AreaCosts getCosts() {
         return costs;
+    }
+
+    @Override
+    public void developArea(final Player owner) {
+        if (!isPlayerOwner(owner)) {
+            System.out.println("Only owner of the area may develop it.");
+            return;
+        }
+
+        final Investment costs = getCurrentDevelopmentCosts();
+        if (costs == null) {
+            System.out.println("Area cannot be developed any further.");
+            return;
+        }
+
+        System.out.printf("This area costs %d resources to develop. You currently have %d resources.\n",
+                costs.resourceCost(), owner.getResources());
+        if (playerDoesNotHaveEnoughResources(owner, costs.resourceCost())) {
+            System.out.println("You do not have enough resources to acquire this area.");
+            return;
+        }
+
+        performDevelopmentProcess(owner, costs, false);
+    }
+
+    @Override
+    public AreaStage getDevelopmentStage() {
+        return developmentStage;
     }
 }

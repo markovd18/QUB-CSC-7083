@@ -38,6 +38,7 @@ public class SaveThePlanetApp {
         Dice dice = new Dice();
         Game game = new Game(players, board, dice);
         game.startGame();
+
     }
 
     private static Board loadBoard() {

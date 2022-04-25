@@ -38,6 +38,7 @@ public class StartArea implements Area {
             return initialResources;
         }
 
+        System.out.printf("\nYou have landed on start area. You receive a regular grant of %d resources.\n", regularGrant);
         return regularGrant;
     }
 

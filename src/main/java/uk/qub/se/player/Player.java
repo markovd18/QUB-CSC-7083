@@ -2,7 +2,9 @@ package uk.qub.se.player;
 
 import uk.qub.se.board.area.Area;
 import uk.qub.se.board.area.BoardMovementResult;
+import uk.qub.se.board.area.DevelopableArea;
 import uk.qub.se.board.area.Investment;
+import uk.qub.se.game.Game;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -13,8 +15,8 @@ public class Player {
     private int resources = 0;
     private int investmentPoints = 0;
     private Area currentPosition;
-    private Set<Area> ownedAreas = new HashSet<>();
-
+    private Game currentGame;
+    private final Set<DevelopableArea> ownedAreas = new HashSet<>();
 
     /**
      * constructs a player object
@@ -22,17 +24,15 @@ public class Player {
      */
     public Player(final String name) { this.name= name; }
 
-    public BoardMovementResult moveToArea(final Area area) {
+    public BoardMovementResult moveToArea(final Area area, Game game) {
         if (area == null) {
             throw new IllegalArgumentException("Area to move to may not be null");
         }
-
+        currentGame = game;
         final BoardMovementResult result = area.acceptPlayer(this);
         currentPosition = area;
         return result;
     }
-
-    //TODO developCurrentArea methods
 
     @Override
     public String toString() {
@@ -46,8 +46,10 @@ public class Player {
         setResources(getResources() + amount);
     }
 
+
     public void updateInvestmentPointsByAmount(final int amount) {
         setInvestmentPoints(getInvestmentPoints() + amount);
+
     }
 
     //getters
@@ -66,7 +68,7 @@ public class Player {
         return currentPosition;
     }
 
-    public Set<Area> getOwnedAreas() {
+    public Set<DevelopableArea> getOwnedAreas() {
 
         return ownedAreas;
     }
@@ -74,7 +76,7 @@ public class Player {
     //setters
     private void setResources(final int resources) {
         if (resources < 0) {
-            // error state - throw?
+            throw new IllegalArgumentException("Player's resource amount may not be negative");
         }
 
         this.resources = resources;
@@ -82,7 +84,7 @@ public class Player {
 
     private void setInvestmentPoints(final int investmentPoints) {
         if (investmentPoints < 0) {
-            // error state - throw?
+            throw new IllegalArgumentException("Player's investment point amount may not be negative");
         }
 
         this.investmentPoints = investmentPoints;
@@ -105,10 +107,11 @@ public class Player {
 
         updateResourcesByAmount(- costs.resourceCost());
         updateInvestmentPointsByAmount(costs.investmentPointsReward());
+        currentGame.addPoints(costs.investmentPointsReward());
     }
 
 
-    public void addOwnedArea(final Area area) {
+    public void addOwnedArea(final DevelopableArea area) {
         if (area == null) {
             return;
         }

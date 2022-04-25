@@ -33,6 +33,10 @@ public class AreaFactory {
     }
 
     private void registerAreaFactory(final Class<? extends Area> area) {
+        if (area.isInterface()) {
+            return;
+        }
+
         try {
             area.getMethod(Area.REGISTRAR_METHOD_NAME, AreaFactory.class).invoke(null, this);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {

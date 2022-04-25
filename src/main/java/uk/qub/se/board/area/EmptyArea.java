@@ -12,7 +12,7 @@ public class EmptyArea implements Area {
             return null;
         }
 
-        System.out.println("Alas, nothing happened.");
+        System.out.println("\nYou have landed on undiscovered land. Scared for your life, you stand still and wait...");
         return BoardMovementResult.NEXT_PLAYER_TURN;
     }
 

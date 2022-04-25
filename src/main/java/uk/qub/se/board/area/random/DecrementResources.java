@@ -13,11 +13,14 @@ public class DecrementResources implements RandomAction {
             throw new IllegalArgumentException("Player to decrement resources to may not be null");
         }
 
+        System.out.printf("\nYou have been accused of throwing thrash around in the local forest. You have to pay %d resources fine.\n", AMOUNT_TO_DECREMENT);
         if (playerHasToQuit(player)) {
+            System.out.println("You do not have enough resources to pay the fine. You're going bankrupt. Game over...");
             return BoardMovementResult.PLAYER_GAME_OVER;
         }
 
         player.updateResourcesByAmount(- AMOUNT_TO_DECREMENT);
+        System.out.printf("You are left with %d resources.\n", player.getResources());
         return BoardMovementResult.NEXT_PLAYER_TURN;
     }
 

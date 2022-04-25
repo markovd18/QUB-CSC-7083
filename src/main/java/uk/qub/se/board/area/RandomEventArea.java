@@ -38,6 +38,7 @@ public class RandomEventArea implements Area {
             return null;
         }
 
+        System.out.println("\nYou have landed on 'Random event area. Unpredictable event will strike you down...'");
         if (!previousEvent.hasNext()) {
             previousEvent = actions.iterator();
         }
