@@ -14,7 +14,7 @@ public class InvestmentTest {
 
     @ParameterizedTest
     @MethodSource("provideInvalidDeps")
-    public void throwsWhenInvalidDepsPassed(final Integer resourceConst, final double investmentPointsReward,
+    public void throwsWhenInvalidDepsPassed(final Integer resourceConst, final Double investmentPointsReward,
                                             final Class<? extends Throwable> exception, final String message) {
         assertThrows(exception, () -> new Investment(resourceConst, investmentPointsReward).validate(), message);
     }
