@@ -27,13 +27,13 @@ public class InvestmentTest {
 
     public static Stream<Arguments> provideInvalidDeps() {
         return Stream.of(
-                Arguments.of(null, 15, IllegalStateException.class,
+                Arguments.of(null, 15.0, IllegalStateException.class,
                         "Constructor should throw IllegalState when null resource cost passed"),
-                Arguments.of(-5, 89, IllegalStateException.class,
+                Arguments.of(-5, 89.0, IllegalStateException.class,
                         "Constructor should throw IllegalState when negative resource cost passed"),
                 Arguments.of(98, null, IllegalStateException.class,
                         "Constructor should throw IllegalState when null investment points reward passed"),
-                Arguments.of(98, -89, IllegalStateException.class,
+                Arguments.of(98, -89.0, IllegalStateException.class,
                         "Constructor should throw IllegalState when negative investment points reward passed")
         );
     }
