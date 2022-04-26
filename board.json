@@ -1,14 +1,14 @@
 {
   "start": {
-    "initialResources": 200,
-    "regularGrant": 50
+    "initialResources": 70,
+    "regularGrant": 20
   },
   "field_1": {
     "name": "Air element",
     "areas": [
       {
         "name": "Air element: Wind power",
-        "catchPhrase": "Your research into wind turbines makes them more powerful, more efficient and the word can rely on them for its power needs!",
+        "catchPhrase": "Your research into wind turbines makes them more powerful, more efficient and the world can rely on them for its power needs!",
         "costs": {
           "initialCost": {
             "resourceCost": 10,
@@ -80,7 +80,7 @@
       },
       {
         "name": "Earth element: Re-forestation",
-        "catchPhrase": "You research new ways to plant bigger, better trees witch suck all the carbon out of the air.",
+        "catchPhrase": "You research new ways to plant bigger, better trees which suck all the carbon out of the air.",
         "costs": {
           "initialCost": {
             "resourceCost": 20,
@@ -101,7 +101,7 @@
         }
       },
       {
-        "name": "Earth element: Low carbon agriculture",
+        "name": "Earth: Low carbon agriculture",
         "catchPhrase": "You research new ways to produce food which dramatically reduces all the carbon produced by farming.",
         "costs": {
           "initialCost": {
@@ -129,8 +129,8 @@
     "name": "Water element",
     "areas": [
       {
-        "name": "Water element: Hydro electric power",
-        "catchPhrase": "Your research team has found a way to use the falling raindrops during rains and storms as a source od renewable energy.",
+        "name": "Water element: Hydro power",
+        "catchPhrase": "Your research team has found a way to use the falling raindrops during rains and storms as a source of renewable energy.",
         "costs": {
           "initialCost": {
             "resourceCost": 40,
@@ -151,8 +151,8 @@
         }
       },
       {
-        "name": "Water element: Hydrogen production",
-        "catchPhrase": "Your scientists made a breakthrough in hydrogen production research which found a way to eliminate hydrogen's ability to cause global warming when released into the atmosphere.",
+        "name": "Water: Hydrogen production",
+        "catchPhrase": "Your scientists made a breakthrough in hydrogen production research which provides unlimited, carbon free fuel!",
         "costs": {
           "initialCost": {
             "resourceCost": 40,

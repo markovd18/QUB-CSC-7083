@@ -10,7 +10,7 @@ import java.util.Set;
 
 public class PrintUtils {
 
-    private static final String LINE_DIV = "----------------------------------------------------------------------";
+    private static final String LINE_DIV = "-------------------------------------------------------------------------------------------------------------------";
 
     public static void printLineDiv() {
         System.out.println(LINE_DIV);
