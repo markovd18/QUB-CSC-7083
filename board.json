@@ -1,7 +1,7 @@
 {
   "start": {
     "initialResources": 70,
-    "regularGrant": 20
+    "regularGrant": 10
   },
   "field_1": {
     "name": "Air element",
