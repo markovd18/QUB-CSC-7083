@@ -71,7 +71,7 @@ public class FieldArea implements DevelopableArea {
         final String processName = isAcquisition ? "acquisition" : "development";
         Scanner scanner = new Scanner(System.in);
 
-        System.out.printf("By %s you receive %d investment points. Do you wish proceed?\n", processName, costs.investmentPointsReward());
+        System.out.printf("By %s you receive %.2f investment points. Do you wish proceed?\n", processName, costs.investmentPointsReward());
         System.out.printf("Press 'Enter' to confirm the %s or anything else to decline: ", processName);
         final String acceptance = scanner.nextLine();
         if (!acceptance.isBlank()) {
@@ -85,7 +85,7 @@ public class FieldArea implements DevelopableArea {
             owner = investor;
         }
         developmentStage = developmentStage.getNextStage();
-        System.out.printf("\nArea %s completed. You gain %d investment points. You are left with %d resources and %d investment points.\n",
+        System.out.printf("\nArea %s completed. You gain %.2f investment points. You are left with %d resources and %.2f investment points.\n",
                 processName, costs.investmentPointsReward(), investor.getResources(), investor.getInvestmentPoints());
         System.out.printf("Current area stage is %s.\n", developmentStage.name());
     }
@@ -96,17 +96,45 @@ public class FieldArea implements DevelopableArea {
 
     private BoardMovementResult forcePlayerToInvest(final Player acceptedPlayer) {
         final Investment investmentCosts = costs.investmentCost();
-        final int resourceCost = investmentCosts.resourceCost();
+
+        int multiplier;
+        //check what stage of development the area is on.
+        switch(developmentStage){
+            case DEVELOPED_0:
+                multiplier = 1;
+                break;
+            case DEVELOPED_1:
+                multiplier = 2;
+                break;
+            case DEVELOPED_2:
+                multiplier = 3;
+                break;
+            case DEVELOPED_3:
+                multiplier = 4;
+                break;
+            default:
+                multiplier = 1;
+                break;
+        }
+        int resourceCostForAcceptedPlayer = investmentCosts.resourceCost();
+        double investmentForAcceptedPlayer = investmentCosts.investmentPointsReward();
+        //increase resource costs according to Area Stage
+        resourceCostForAcceptedPlayer = resourceCostForAcceptedPlayer * multiplier;
+        investmentForAcceptedPlayer = investmentForAcceptedPlayer * multiplier;
+        Investment investmentCostsForAcceptedPlayer = new Investment(resourceCostForAcceptedPlayer, investmentForAcceptedPlayer);
+
+
         System.out.printf("\nThe area is owned by %s. \nYou have to make an investment into their efforts to save the planet. Required investment is %d resources. \n",
-                owner.getName(), resourceCost);
-        if (playerDoesNotHaveEnoughResources(acceptedPlayer, resourceCost)) {
+                owner.getName(), resourceCostForAcceptedPlayer);
+
+        if (playerDoesNotHaveEnoughResources(acceptedPlayer, resourceCostForAcceptedPlayer)) {
             System.out.println("\nYou do not have enough resources to invest. You declare bankruptcy. Game over.");
             return BoardMovementResult.PLAYER_GAME_OVER;
         }
 
-        acceptedPlayer.makeInvestment(investmentCosts);
-        owner.updateResourcesByAmount(resourceCost);
-        System.out.printf("Investment made. %d investment points acquired. You are left with %d resources and %d investment points.\n",
+        acceptedPlayer.makeInvestment(investmentCostsForAcceptedPlayer);
+        owner.updateResourcesByAmount(resourceCostForAcceptedPlayer);
+        System.out.printf("Investment made. %.2f investment points acquired. You are left with %d resources and %.2f investment points.\n",
                 investmentCosts.investmentPointsReward(), acceptedPlayer.getResources(), acceptedPlayer.getInvestmentPoints());
         return BoardMovementResult.NEXT_PLAYER_TURN;
     }

@@ -23,9 +23,9 @@ public class PrintUtils {
 
         String name = player.getName();
         String pos = player.getCurrentPosition().getName();
-        int invpts = player.getInvestmentPoints();
+        double invpts = player.getInvestmentPoints();
         int res = player.getResources();
-        System.out.printf("|%-15s |%-35s |%-10d |%-10d |", name, pos, invpts, res);
+        System.out.printf("|%-15s |%-35s |%-10.2f |%-10d |", name, pos, invpts, res);
 
         Set<DevelopableArea> playerOwnedAreas = player.getOwnedAreas();
         for (Area a : playerOwnedAreas) {
@@ -35,8 +35,8 @@ public class PrintUtils {
         System.out.println();
     }
 
-    public static void printGameInfoHeader(final int totalInvestmentPoints, final int maxInvestmentPoints) {
-        System.out.printf("\nTotal number of investment points: %d / %d\n", totalInvestmentPoints, maxInvestmentPoints);
+    public static void printGameInfoHeader(final double totalInvestmentPoints, final double maxInvestmentPoints) {
+        System.out.printf("\nTotal number of investment points: %.2f / %.2f\n", totalInvestmentPoints, maxInvestmentPoints);
         printLineDiv();
         System.out.printf ("|%-15s |%-35s |%-10s |%-10s |%-35s\n",
                 "PLAYER NAME", "CURRENT POS", "INV POINTS", "RESOURCES", "OWNED AREAS");

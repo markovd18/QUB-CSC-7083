@@ -13,7 +13,7 @@ public class Player {
 
     private final String name;
     private int resources = 0;
-    private int investmentPoints = 0;
+    private double investmentPoints = 0;
     private Area currentPosition;
     private Game currentGame;
     private final Set<DevelopableArea> ownedAreas = new HashSet<>();
@@ -47,7 +47,7 @@ public class Player {
     }
 
 
-    public void updateInvestmentPointsByAmount(final int amount) {
+    public void updateInvestmentPointsByAmount(final double amount) {
         setInvestmentPoints(getInvestmentPoints() + amount);
 
     }
@@ -59,7 +59,7 @@ public class Player {
         return resources;
     }
 
-    public int getInvestmentPoints() {
+    public double getInvestmentPoints() {
         return investmentPoints;
     }
 
@@ -82,7 +82,7 @@ public class Player {
         this.resources = resources;
     }
 
-    private void setInvestmentPoints(final int investmentPoints) {
+    private void setInvestmentPoints(final double investmentPoints) {
         if (investmentPoints < 0) {
             throw new IllegalArgumentException("Player's investment point amount may not be negative");
         }

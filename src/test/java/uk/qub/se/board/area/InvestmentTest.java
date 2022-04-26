@@ -14,14 +14,14 @@ public class InvestmentTest {
 
     @ParameterizedTest
     @MethodSource("provideInvalidDeps")
-    public void throwsWhenInvalidDepsPassed(final Integer resourceConst, final Integer investmentPointsReward,
+    public void throwsWhenInvalidDepsPassed(final Integer resourceConst, final double investmentPointsReward,
                                             final Class<? extends Throwable> exception, final String message) {
         assertThrows(exception, () -> new Investment(resourceConst, investmentPointsReward).validate(), message);
     }
 
     @Test
     public void doesNotThrowWhenValidDepsPassed() {
-        assertDoesNotThrow(() -> new Investment(89, 65).validate(),
+        assertDoesNotThrow(() -> new Investment(89, 65.0).validate(),
                 "Constructor should not throw when valid dependencies passed");
     }
 

@@ -1,6 +1,8 @@
 package uk.qub.se.board.area;
 
-public record Investment(Integer resourceCost, Integer investmentPointsReward) {
+import java.math.BigDecimal;
+
+public record Investment(Integer resourceCost, Double investmentPointsReward) {
     public void validate() throws IllegalStateException {
         if (resourceCost == null || investmentPointsReward == null) {
             throw new IllegalStateException("Neither field resource cost nor investment points reward can be set to null.");

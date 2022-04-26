@@ -26,7 +26,7 @@ public class Game {
 
     private GameStatus status;
 
-    private int totalInvestment = 0;
+    private double totalInvestment = 0;
 
     public Game(final List<Player> players, final Board board, final Dice dice) {
         validateDependencies(players, board, dice);
@@ -54,27 +54,25 @@ public class Game {
         RUNNING, STOPPED
     }
 
-    private int getPoints(){
+    private double getPoints(){
        return totalInvestment;
     }
 
-    public void addPoints(int pointsToAdd){
+    public void addPoints(double pointsToAdd){
         totalInvestment = totalInvestment + pointsToAdd;
     }
 
     public void startGame() {
         final List<Player> activePlayers = initiateActivePlayers();
-        //set GameStatus to RUNNING
+
         run();
 
-        //sets all players initial currentPosition to startArea
         for(Player player : activePlayers){
             player.moveToArea(board.getStartArea(), this);
         }
-        //show starting stats
+
         displayGameStats(activePlayers);
-        //iterate over each player & Display the menu allowing each player to choose their next move whilst game
-        //is in play only
+
          do {
              iterateThroughActivePlayers(activePlayers);
          } while(isGameRunning() && isInvestmentPointsWithinLimit());
